@@ -31,7 +31,9 @@ createRoot(document.getElementById("root")!).render(
           <Route path="content-hub" element={<ContentHubPage />} />
           <Route path="overview" element={<OverviewPage />} />
           <Route path="pages" element={<Pages />} />
+          <Route path="pages/:pageId/:tab" element={<Pages />} />
           <Route path="emails" element={<Emails />} />
+          <Route path="emails/:pageId/:tab" element={<Emails />} />
           <Route path="activity-types" element={<ActivityTypes />} />
           <Route path="activity-types/click" element={<ActivityTypeGeneral />} />
         </Route>

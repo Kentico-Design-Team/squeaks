@@ -50,6 +50,18 @@ export type ShellProps = {
   actions?: ReactNode;
   activeNav?: ShellNavId;
   subNav?: Partial<Record<ShellNavId, ShellSubNav>>;
+  /**
+   * Tighten the right gap. Normally the content clears the AIRA rail by the
+   * usual margin (120 − 40). When the content has a right-side view menu, set
+   * this so that menu sits only 24px from the AIRA rail/panel.
+   */
+  tightRight?: boolean;
+  /**
+   * Lock the content to the viewport height so the page itself never scrolls.
+   * Inner panels manage their own scrolling (e.g. the editor: tree + view menu
+   * stay fixed, only the canvas scrolls).
+   */
+  fitHeight?: boolean;
 };
 
 const NAV: { id: ShellNavId; label: string; icon: typeof Menu; href: string }[] =
@@ -131,6 +143,8 @@ export function Shell({
   actions = DEFAULT_ACTIONS,
   activeNav = "content",
   subNav,
+  tightRight = false,
+  fitHeight = false,
 }: ShellProps) {
   const [openNav, setOpenNav] = useState<ShellNavId | null>(null);
   const [view, setView] = useState<"list" | "grid">("list");
@@ -169,7 +183,7 @@ export function Shell({
             />
           </Link>
 
-          <nav className="mt-8 flex w-full flex-col items-center gap-3">
+          <nav className="mt-8 flex w-full flex-col items-center gap-6">
             {NAV.map((item) => {
               const Icon = item.icon;
               const active = openNav ? item.id === openNav : item.id === activeNav;
@@ -214,10 +228,15 @@ export function Shell({
         onWidthChange={setAiraWidth}
       />
 
-      {/* Main grid: top bar + content, offset for sidebar and right rail */}
+      {/* Main grid: top bar + content, offset for sidebar and right rail.
+          tightRight: view-menu sits 24px from the AIRA rail (40+24) / panel. */}
       <div
         data-aira-open={airaOpen}
-        className="grid h-screen grid-cols-1 grid-rows-[72px_1fr] pl-[96px] pr-[120px] data-[aira-open=true]:pr-[calc(var(--aira-panel)+80px)]"
+        className={`grid h-screen grid-cols-1 grid-rows-[72px_1fr] pl-[96px] ${
+          tightRight
+            ? "pr-[64px] data-[aira-open=true]:pr-[calc(var(--aira-panel)+24px)]"
+            : "pr-[120px] data-[aira-open=true]:pr-[calc(var(--aira-panel)+80px)]"
+        }`}
       >
       {/* Top bar */}
       <header className="flex items-center justify-between gap-4 px-4">
@@ -258,8 +277,16 @@ export function Shell({
         <div className="flex items-center gap-3">{actions}</div>
       </header>
 
-      {/* Main content */}
-      <main className="overflow-auto px-4 py-6">{children}</main>
+      {/* Main content. tightRight drops the right padding so the view menu
+          lands on the 24px gap; fitHeight locks the height so only inner
+          panels scroll instead of the whole page. */}
+      <main
+        className={`min-h-0 py-6 ${fitHeight ? "overflow-hidden" : "overflow-auto"} ${
+          tightRight ? "pl-4 pr-0" : "px-4"
+        }`}
+      >
+        {children}
+      </main>
       </div>
 
       {/* Flyout drawer + overlay */}

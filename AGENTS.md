@@ -85,7 +85,9 @@ src/pages/
 
 ## Design patterns
 
-Patterns that have been explicitly specified or corrected are documented in `docs/patterns/` — one file per pattern. Check the folder before re-implementing a pattern (e.g. secondary navigation drill-down).
+Explicitly-specified patterns and corrections are documented in `docs/patterns/` — one file per pattern, grouped by category, indexed in `docs/patterns/README.md`. Check the folder before re-implementing a pattern (e.g. secondary navigation drill-down).
+
+**Whenever the user describes a new pattern, rule, or correction, document it there right away** — create or update the relevant file and add it to the README index — without waiting to be asked. Keep entries terse and record only specified rules, never an auto-catalog of the code.
 
 ## Available Shadcn components
 

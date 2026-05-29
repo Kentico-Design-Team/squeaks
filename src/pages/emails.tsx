@@ -36,15 +36,12 @@ const Actions = (
 export default function Emails() {
   return (
     <Editor
+      basePath="/emails"
       workspace="Dancing Goat"
       activeNav="marketing"
       status="Saved"
       actions={Actions}
-      breadcrumbs={[
-        { label: "Dancing Goat Emails" },
-        { label: "Newsletters" },
-        { label: "Spring Coffee Sale" },
-      ]}
+      breadcrumbs={[{ label: "Dancing Goat Emails" }]}
       newLabel="NEW EMAIL"
       treeItems={[
         {
@@ -53,10 +50,10 @@ export default function Emails() {
           expanded: true,
           children: [
             { label: "Welcome series", children: [] },
-            { label: "Spring Coffee Sale", icon: Mail, active: true, published: true },
-            { label: "Monthly newsletter", icon: Mail, published: true },
-            { label: "Abandoned cart", icon: Mail },
-            { label: "Order confirmation", icon: Mail, published: true },
+            { label: "Spring Coffee Sale", slug: "spring-coffee-sale", icon: Mail, published: true },
+            { label: "Monthly newsletter", slug: "monthly-newsletter", icon: Mail, published: true },
+            { label: "Abandoned cart", slug: "abandoned-cart", icon: Mail },
+            { label: "Order confirmation", slug: "order-confirmation", icon: Mail, published: true },
             { label: "Promotions", children: [] },
             { label: "Re-engagement", children: [] },
             { label: "Archive", children: [] },
@@ -64,13 +61,13 @@ export default function Emails() {
         },
       ]}
       tabs={[
-        { icon: Eye, label: "Preview" },
-        { icon: FileText, label: "Content", active: true },
-        { icon: LayoutGrid, label: "Email Builder" },
-        { icon: BarChart, label: "Statistics" },
-        { icon: Users, label: "Contact activities" },
-        { icon: Menu, label: "Menu Item" },
-        { icon: Menu, label: "Menu Item" },
+        { icon: Eye, slug: "preview", label: "Preview" },
+        { icon: FileText, slug: "content", label: "Content" },
+        { icon: LayoutGrid, slug: "email-builder", label: "Email Builder" },
+        { icon: BarChart, slug: "statistics", label: "Statistics" },
+        { icon: Users, slug: "contact-activities", label: "Contact activities" },
+        { icon: Menu, slug: "menu-item-1", label: "Menu Item" },
+        { icon: Menu, slug: "menu-item-2", label: "Menu Item" },
       ]}
     />
   );
