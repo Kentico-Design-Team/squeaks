@@ -1,4 +1,4 @@
-import { type ComponentType, type ReactNode } from "react";
+import { type ComponentType, type ReactNode, useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { Shell, type ShellBreadcrumb, type ShellProps } from "@/templates/shell";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,10 @@ import {
   ChevronDown,
   ChevronRight,
   Folder,
+  Pencil,
   Plus,
   Search,
+  X,
 } from "lucide-react";
 
 type IconType = ComponentType<{ className?: string; strokeWidth?: number }>;
@@ -31,6 +33,19 @@ export type EditorTreeItem = {
 /** Passed to a tab's content render function. */
 export type EditorContentContext = { page?: EditorTreeItem };
 
+/**
+ * Item in a tab's side menu — the second menu shown below the view menu.
+ * Clicking it opens its content in the side panel overlay.
+ */
+export type EditorSideMenuItem = {
+  /** Stable id used to track the open panel. */
+  slug: string;
+  label: string;
+  icon: IconType;
+  /** Panel content. A function form receives the active page. */
+  content?: ReactNode | ((ctx: EditorContentContext) => ReactNode);
+};
+
 export type EditorTab = {
   /** Slug used in the URL. */
   slug: string;
@@ -41,6 +56,13 @@ export type EditorTab = {
    * receives the active page so the content can reflect it.
    */
   content?: ReactNode | ((ctx: EditorContentContext) => ReactNode);
+  /** Tab renders its own page heading, so the template omits the shared one. */
+  ownHeading?: boolean;
+  /**
+   * Optional secondary menu shown below the view menu while this tab is active.
+   * Each item opens the side panel. Tabs without it show only the view menu.
+   */
+  sideMenu?: EditorSideMenuItem[];
 };
 
 export type EditorProps = Omit<ShellProps, "children" | "breadcrumbs"> & {
@@ -50,36 +72,14 @@ export type EditorProps = Omit<ShellProps, "children" | "breadcrumbs"> & {
   breadcrumbs?: ShellBreadcrumb[];
   /** Label of the split "new" button above the tree. */
   newLabel?: string;
+  /**
+   * Left tree panel. Optional — omit it (or pass an empty array) to hide the
+   * panel entirely, e.g. an editor that doesn't browse a page hierarchy.
+   */
   treeItems?: EditorTreeItem[];
   /** Right vertical view menu — each tab swaps the canvas content. */
   tabs?: EditorTab[];
 };
-
-const DEFAULT_TREE: EditorTreeItem[] = [
-  {
-    label: "Root",
-    icon: Folder,
-    expanded: true,
-    children: [
-      { label: "Home", slug: "home" },
-      { label: "Coffees", children: [] },
-      { label: "Articles", children: [] },
-      { label: "About Us", slug: "about-us", published: true },
-      { label: "Cafes", children: [] },
-      { label: "Contacts", slug: "contacts", published: true },
-      { label: "Navigation menu", slug: "navigation-menu" },
-      {
-        label: "Landing pages",
-        expanded: true,
-        children: [
-          { label: "Coffee samples", slug: "coffee-samples", published: true },
-        ],
-      },
-      { label: "Footer", children: [] },
-      { label: "Specials", children: [] },
-    ],
-  },
-];
 
 const DEFAULT_TABS: EditorTab[] = [];
 
@@ -165,13 +165,37 @@ function TreeNode({
   );
 }
 
+/** Icon-tile + label used by both the view menu and the side menu. */
+function MenuItemBody({
+  icon: Icon,
+  label,
+  active,
+}: {
+  icon: IconType;
+  label: string;
+  active: boolean;
+}) {
+  return (
+    <>
+      <span
+        className={`grid h-11 w-11 place-items-center rounded-xl ${
+          active ? "bg-black text-white" : ""
+        }`}
+      >
+        <Icon className="h-5 w-5" strokeWidth={2.25} />
+      </span>
+      <span className={`text-xs ${active ? "font-bold" : ""}`}>{label}</span>
+    </>
+  );
+}
+
 function TabPlaceholder({ page, tab }: { page?: string; tab?: string }) {
   return (
-    <div className="flex h-full flex-col gap-4 p-6">
-      <h1 className="text-2xl font-bold">{tab}</h1>
+    <div className="flex h-full flex-col gap-4 px-8 py-6">
+      <h2 className="text-lg font-bold">{tab}</h2>
       <div className="flex flex-1 items-center justify-center rounded-xl border-2 border-dashed border-black">
         <span className="font-bold">
-          {tab} view — {page ?? "—"}
+          {tab} view{page ? ` — ${page}` : ""}
         </span>
       </div>
     </div>
@@ -182,13 +206,14 @@ export function Editor({
   basePath,
   breadcrumbs,
   newLabel = "NEW PAGE",
-  treeItems = DEFAULT_TREE,
+  treeItems,
   tabs = DEFAULT_TABS,
   ...shellProps
 }: EditorProps) {
   const params = useParams();
 
-  const pages = collectPages(treeItems);
+  const hasTree = !!treeItems && treeItems.length > 0;
+  const pages = collectPages(treeItems ?? []);
   const activePage = pages.find((p) => p.slug === params.pageId) ?? pages[0];
   // Default to the first tab that has real content, so a bare URL lands on a
   // meaningful view rather than an empty placeholder.
@@ -199,8 +224,10 @@ export function Editor({
   const tabSlug = activeTab?.slug ?? tabs[0]?.slug ?? "";
 
   // Switching pages keeps the current tab; switching tabs keeps the page.
+  // With no tree there's no page segment, so tabs live directly under basePath.
   const hrefForPage = (slug: string) => `${basePath}/${slug}/${tabSlug}`;
-  const hrefForTab = (slug: string) => `${basePath}/${pageSlug}/${slug}`;
+  const hrefForTab = (slug: string) =>
+    pageSlug ? `${basePath}/${pageSlug}/${slug}` : `${basePath}/${slug}`;
 
   const crumbs: ShellBreadcrumb[] = [
     ...(breadcrumbs ?? []),
@@ -213,6 +240,19 @@ export function Editor({
       ? activeTab.content({ page: activePage })
       : activeTab?.content;
 
+  // Side menu (second menu below the view menu) + the side panel it opens.
+  // No item is active until clicked; switching page or tab closes the panel.
+  const sideMenu = activeTab?.sideMenu ?? [];
+  const [openPanelSlug, setOpenPanelSlug] = useState<string | null>(null);
+  useEffect(() => setOpenPanelSlug(null), [pageSlug, tabSlug]);
+
+  const activeSideItem =
+    sideMenu.find((item) => item.slug === openPanelSlug) ?? null;
+  const sidePanelContent =
+    typeof activeSideItem?.content === "function"
+      ? activeSideItem.content({ page: activePage })
+      : activeSideItem?.content;
+
   return (
     // View menu present → tighten the gap to AIRA to 24px. fitHeight keeps the
     // tree + view menu fixed; only the canvas scrolls.
@@ -222,14 +262,15 @@ export function Editor({
       tightRight={shellProps.tightRight ?? tabs.length > 0}
       fitHeight
     >
-      <div className="flex h-full min-h-0">
-        {/* Left tree panel */}
+      <div className="relative flex h-full min-h-0">
+        {/* Left tree panel — optional; hidden when no treeItems are passed */}
+        {hasTree && (
         <aside className="mr-1 flex w-[304px] shrink-0 flex-col gap-4 rounded-xl border-2 border-black bg-background p-3">
           {/* Split "new" button */}
           <div className="flex">
             <Button
               variant="outline"
-              className="h-10 flex-1 rounded-l-full rounded-r-none px-4 text-xs font-bold tracking-wide"
+              className="h-10 flex-1 rounded-l-full rounded-r-none px-6 text-xs font-bold tracking-wide has-[>svg]:px-6"
             >
               <Plus className="h-4 w-4" strokeWidth={2.5} />
               {newLabel}
@@ -268,40 +309,93 @@ export function Editor({
             ))}
           </ul>
         </aside>
+        )}
 
-        {/* Center canvas — content of the active view-menu tab */}
+        {/* Center canvas — shared page heading + content of the active tab */}
         <div className="min-h-0 flex-1 overflow-auto rounded-xl border-2 border-black bg-background">
+          {activePage && !activeTab?.ownHeading && (
+            <div className="flex items-center gap-2 px-8 pt-8">
+              <h1 className="text-xl font-bold">{activePage.label}</h1>
+              <button type="button" aria-label="Rename">
+                <Pencil className="h-4 w-4" strokeWidth={2.25} />
+              </button>
+            </div>
+          )}
           {tabContent ?? (
             <TabPlaceholder page={activePage?.label} tab={activeTab?.label} />
           )}
         </div>
 
-        {/* Right view menu */}
+        {/* Side panel — overlays the page when a side-menu item is open.
+            Fixed 648px wide, 8px from the top/bottom of the viewport, with its
+            right edge 8px left of the 88px menu column. The right offset tracks
+            the AIRA rail (closed) vs. panel (open): 64px/var(--aira-panel)+24px
+            of shell padding, plus the 88px menu and 8px gap. */}
+        {activeSideItem && (
+          <div className="fixed inset-y-2 right-[160px] z-20 flex w-[648px] flex-col rounded-xl border-2 border-black bg-background group-data-[aira-open=true]/shell:right-[calc(var(--aira-panel)+120px)]">
+            <header className="flex items-center justify-between px-6 py-4">
+              <h2 className="text-xl font-bold">{activeSideItem.label}</h2>
+              <button
+                type="button"
+                aria-label="Close panel"
+                onClick={() => setOpenPanelSlug(null)}
+              >
+                <X className="h-5 w-5" strokeWidth={2.25} />
+              </button>
+            </header>
+            <div className="min-h-0 flex-1 overflow-auto px-6 pb-6">
+              {sidePanelContent ?? (
+                <div className="flex h-full items-center justify-center rounded-xl border-2 border-dashed border-black">
+                  <span className="font-bold">{activeSideItem.label} panel</span>
+                </div>
+              )}
+            </div>
+            <footer className="flex justify-end border-t-2 border-black px-6 py-4">
+              <Button className="h-10 rounded-full px-6 text-xs font-bold tracking-wide">
+                SAVE
+              </Button>
+            </footer>
+          </div>
+        )}
+
+        {/* Right menus column — view menu, plus the tab's side menu below it */}
         {tabs.length > 0 && (
-          <nav className="ml-4 flex w-[88px] shrink-0 flex-col gap-2 self-start rounded-xl border-2 border-black bg-background px-1 py-2">
-            {tabs.map((tab, i) => {
-              const Icon = tab.icon;
-              const active = tab.slug === tabSlug;
-              return (
+          <div className="ml-4 flex w-[88px] shrink-0 flex-col gap-4 self-start">
+            <nav className="flex flex-col gap-1 rounded-xl border-2 border-black bg-background px-1 py-2">
+              {tabs.map((tab, i) => (
                 <Link
                   key={`${tab.slug}-${i}`}
                   to={hrefForTab(tab.slug)}
                   className="flex flex-col items-center gap-1.5 px-1 py-2 text-center leading-tight"
                 >
-                  <span
-                    className={`grid h-11 w-11 place-items-center rounded-xl ${
-                      active ? "bg-black text-white" : ""
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" strokeWidth={2.25} />
-                  </span>
-                  <span className={`text-xs ${active ? "font-bold" : ""}`}>
-                    {tab.label}
-                  </span>
+                  <MenuItemBody
+                    icon={tab.icon}
+                    label={tab.label}
+                    active={tab.slug === tabSlug}
+                  />
                 </Link>
-              );
-            })}
-          </nav>
+              ))}
+            </nav>
+
+            {sideMenu.length > 0 && (
+              <nav className="flex flex-col gap-1 rounded-xl border-2 border-black bg-background px-1 py-2">
+                {sideMenu.map((item, i) => (
+                  <button
+                    key={`${item.slug}-${i}`}
+                    type="button"
+                    onClick={() => setOpenPanelSlug(item.slug)}
+                    className="flex flex-col items-center gap-1.5 px-1 py-2 text-center leading-tight"
+                  >
+                    <MenuItemBody
+                      icon={item.icon}
+                      label={item.label}
+                      active={item.slug === openPanelSlug}
+                    />
+                  </button>
+                ))}
+              </nav>
+            )}
+          </div>
         )}
       </div>
     </Shell>

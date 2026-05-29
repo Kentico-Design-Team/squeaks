@@ -1,5 +1,13 @@
 import { ContentHub, RowActions, StatusBadge } from "@/templates/content-hub";
-import { FileText, Image as ImageIcon, Mail, Trash2 } from "lucide-react";
+import {
+  Clock,
+  FileEdit,
+  FileText,
+  Files,
+  Image as ImageIcon,
+  Mail,
+  Trash2,
+} from "lucide-react";
 
 const ITEMS: [string, string, string, string][] = [
   ["Tellus", "Article", "Dancing Goat", "05/29/2026 8:28 AM"],
@@ -21,6 +29,7 @@ export default function ContentHubPage() {
         { label: "Coffee KX1 - Lesson 1" },
       ]}
       status="Saved"
+      actions={null}
       activeNav="content"
       subNav={{
         content: {
@@ -35,7 +44,7 @@ export default function ContentHubPage() {
         },
       }}
       callout={{
-        title: "Friendly warning",
+        label: "Friendly warning",
         body: "Heads up — this content item is referenced by 4 pages and 2 emails. Changes you publish will be reflected everywhere.",
       }}
       primaryAction="NEW CONTENT ITEM"
@@ -45,9 +54,21 @@ export default function ContentHubPage() {
         { label: "Status: Published" },
       ]}
       shortcuts={[
-        { label: "All content items", active: true },
-        { label: "Content in draft" },
-        { label: "Recently modified" },
+        {
+          label: "All content items",
+          active: true,
+          icon: <Files className="h-4 w-4" strokeWidth={2.25} />,
+        },
+      ]}
+      smartFolders={[
+        {
+          label: "Content in draft",
+          icon: <FileEdit className="h-4 w-4" strokeWidth={2.25} />,
+        },
+        {
+          label: "Recently modified",
+          icon: <Clock className="h-4 w-4" strokeWidth={2.25} />,
+        },
       ]}
       folders={[
         { label: "News" },

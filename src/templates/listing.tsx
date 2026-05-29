@@ -4,6 +4,7 @@ import {
   SecondaryNav,
   type SecondaryNavData,
 } from "@/components/custom/secondary-nav";
+import { Callout } from "@/components/custom/callout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -157,16 +158,12 @@ export function Listing({
   ...shellProps
 }: ListingProps) {
   const calloutNode = isCalloutObject(callout) ? (
-    <div className="rounded-xl border-2 border-black bg-muted px-4 py-3">
-      <div className="flex items-center gap-2 text-xs font-bold">
-        <TriangleAlert className="h-4 w-4" strokeWidth={2.25} />
-        {callout.label ?? "Friendly warning"}
-      </div>
-      {callout.headline && (
-        <div className="mt-2 font-bold">{callout.headline}</div>
-      )}
-      {callout.body && <div className="mt-1">{callout.body}</div>}
-    </div>
+    <Callout
+      icon={TriangleAlert}
+      label={callout.label ?? "Friendly warning"}
+      headline={callout.headline}
+      body={callout.body}
+    />
   ) : (
     callout
   );
@@ -208,7 +205,7 @@ export function Listing({
             {showFilter && (
               <Button
                 variant="outline"
-                className="h-10 shrink-0 gap-2 rounded-full px-6 text-xs font-bold tracking-wide"
+                className="h-10 shrink-0 gap-2 rounded-full px-6 text-xs font-bold tracking-wide has-[>svg]:px-6"
               >
                 <ListFilter className="h-4 w-4" strokeWidth={2.25} />
                 FILTER
@@ -218,11 +215,11 @@ export function Listing({
 
           {/* Applied filters */}
           {appliedFilters && appliedFilters.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 text-sm">
               <span className="font-bold">Applied filters</span>
               <button
                 type="button"
-                className="flex items-center gap-1 text-xs font-bold tracking-wide underline-offset-2 hover:underline"
+                className="flex items-center gap-1 text-sm font-bold tracking-wide underline-offset-2 hover:underline"
               >
                 <X className="h-3 w-3" strokeWidth={2.5} />
                 CLEAR ALL
@@ -232,7 +229,7 @@ export function Listing({
                   <Badge
                     key={i}
                     variant="outline"
-                    className="gap-1 rounded-full px-3 py-1"
+                    className="gap-1 rounded-full px-3 py-1 text-sm"
                   >
                     {filter}
                     <X className="h-3 w-3" strokeWidth={2.5} />

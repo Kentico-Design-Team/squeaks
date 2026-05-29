@@ -7,6 +7,7 @@ import {
   type SecondaryNavData,
 } from "@/components/custom/secondary-nav";
 import { Lightbulb } from "lucide-react";
+import { Callout } from "@/components/custom/callout";
 
 export type OverviewCallout = {
   /** Small eyebrow label next to the lightbulb icon. */
@@ -71,18 +72,12 @@ export function Overview({
           <h1 className="text-2xl font-bold">{title}</h1>
 
           {/* Quick tip callout */}
-          <div className="flex gap-3 rounded-xl border-2 border-black p-4">
-            <Lightbulb className="mt-0.5 h-5 w-5 shrink-0" strokeWidth={2.25} />
-            <div className="space-y-1">
-              {callout.label && (
-                <div className="text-xs font-bold tracking-wide">
-                  {callout.label}
-                </div>
-              )}
-              <div className="font-bold">{callout.title}</div>
-              <p className="text-muted-foreground">{callout.body}</p>
-            </div>
-          </div>
+          <Callout
+            icon={Lightbulb}
+            label={callout.label}
+            headline={callout.title}
+            body={callout.body}
+          />
 
           {/* Primary action */}
           <div>

@@ -26,6 +26,11 @@ const TEMPLATES: Entry[] = [
     name: "Editor",
     desc: "Tree + canvas + right view menu (URL-driven)",
   },
+  {
+    path: "/edit-form",
+    name: "Edit form",
+    desc: "Drill-down secondary nav + record edit form (max 66.66% wide)",
+  },
 ];
 
 // Standalone pages built on an existing template, not a template preview.
@@ -38,7 +43,7 @@ const PAGES: Entry[] = [
   {
     path: "/emails",
     name: "Emails editor",
-    desc: "Editor template with an email tree & email tab rail",
+    desc: "Editor template with no tree — just the email view-menu rail",
   },
   {
     path: "/contacts",
@@ -49,6 +54,11 @@ const PAGES: Entry[] = [
     path: "/activity-types",
     name: "Activity types",
     desc: "Drill-down secondary nav — open a row to nest deeper",
+  },
+  {
+    path: "/secondary-nav-showcase",
+    name: "Secondary nav — 4 levels deep",
+    desc: "Drill-down secondary nav nested four levels, bordered boxes",
   },
 ];
 

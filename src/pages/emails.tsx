@@ -6,7 +6,6 @@ import {
   Eye,
   FileText,
   LayoutGrid,
-  Mail,
   Menu,
   Users,
 } from "lucide-react";
@@ -25,7 +24,7 @@ const Actions = (
       </Button>
       <Button
         aria-label="Publish options"
-        className="-ml-0.5 h-10 rounded-l-none rounded-r-full px-2"
+        className="h-10 rounded-l-none rounded-r-full border-l-2 border-l-white px-2"
       >
         <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
       </Button>
@@ -43,23 +42,6 @@ export default function Emails() {
       actions={Actions}
       breadcrumbs={[{ label: "Dancing Goat Emails" }]}
       newLabel="NEW EMAIL"
-      treeItems={[
-        {
-          label: "Root",
-          icon: Mail,
-          expanded: true,
-          children: [
-            { label: "Welcome series", children: [] },
-            { label: "Spring Coffee Sale", slug: "spring-coffee-sale", icon: Mail, published: true },
-            { label: "Monthly newsletter", slug: "monthly-newsletter", icon: Mail, published: true },
-            { label: "Abandoned cart", slug: "abandoned-cart", icon: Mail },
-            { label: "Order confirmation", slug: "order-confirmation", icon: Mail, published: true },
-            { label: "Promotions", children: [] },
-            { label: "Re-engagement", children: [] },
-            { label: "Archive", children: [] },
-          ],
-        },
-      ]}
       tabs={[
         { icon: Eye, slug: "preview", label: "Preview" },
         { icon: FileText, slug: "content", label: "Content" },

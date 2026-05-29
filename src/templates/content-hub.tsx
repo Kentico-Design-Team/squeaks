@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/table";
 import {
   ArrowUp,
-  CheckCircle2,
   ChevronDown,
   ChevronRight,
   Clock,
@@ -28,9 +27,16 @@ import {
   MoreHorizontal,
   Plus,
   Search,
+  Settings,
   Trash2,
   TriangleAlert,
+  X,
 } from "lucide-react";
+import { Callout } from "@/components/custom/callout";
+import { StatusBadge, TagBadge } from "@/templates/listing";
+
+// Chips/filters are unified across the app — reuse the listing's components.
+export { StatusBadge, TagBadge };
 
 /* ---------------------------------- Tree --------------------------------- */
 
@@ -69,17 +75,19 @@ export type AppliedFilter = {
 
 export type ContentHubProps = Omit<ShellProps, "children"> & {
   title?: string;
-  /** Yellow-style callout banner copy (rendered monochrome). */
-  callout?: { title: string; body?: string };
+  /** Warning callout banner (rendered monochrome via the shared Callout). */
+  callout?: { label?: string; headline?: string; body?: string };
   primaryAction?: string;
   searchPlaceholder?: string;
   appliedFilters?: AppliedFilter[];
   itemCount?: number;
   columns?: ContentHubColumn[];
   rows?: ContentHubRow[];
-  /** Top shortcuts above the Folders section. */
+  /** Standalone shortcuts at the top (e.g. "All content items"). */
   shortcuts?: TreeShortcut[];
-  /** Recursive folder tree under the "Folders" heading. */
+  /** Items under the collapsible "Smart folders" section. */
+  smartFolders?: TreeShortcut[];
+  /** Recursive folder tree under the "Folders" section. */
   folders?: TreeNode[];
 };
 
@@ -103,6 +111,9 @@ const DEFAULT_SHORTCUTS: TreeShortcut[] = [
     icon: <Files className="h-4 w-4" strokeWidth={2.25} />,
     active: true,
   },
+];
+
+const DEFAULT_SMART_FOLDERS: TreeShortcut[] = [
   {
     label: "Content in draft",
     icon: <FileEdit className="h-4 w-4" strokeWidth={2.25} />,
@@ -128,7 +139,7 @@ const DEFAULT_FOLDERS: TreeNode[] = [
       },
     ],
   },
-  { label: "Authors" },
+  { label: "Authors", children: [{ label: "Team" }] },
   { label: "Logos" },
 ];
 
@@ -137,16 +148,9 @@ const DEFAULT_COLUMNS: ContentHubColumn[] = [
   { label: "Default column" },
   { label: "Default column" },
   { label: "Default column" },
-  { label: "Status" },
+  { label: "Default column" },
   { label: "Actions", cellAlign: "right" },
 ];
-
-export const StatusBadge = ({ children = "Enabled" }: { children?: ReactNode }) => (
-  <Badge className="gap-1 rounded-md px-2 py-0.5 font-bold">
-    <CheckCircle2 className="h-3 w-3" strokeWidth={2.5} />
-    {children}
-  </Badge>
-);
 
 export const RowActions = () => (
   <span className="flex items-center justify-end gap-1">
@@ -167,18 +171,17 @@ export const RowActions = () => (
   </span>
 );
 
-const makeRow = (id: number, email: string, c1: string, c2: string): ContentHubRow => ({
+const makeRow = (id: number, c1: string, c2: string, c3: string): ContentHubRow => ({
   id,
-  cells: [email, c1, c2, "—", <StatusBadge />, <RowActions />],
+  cells: ["marekm@kentico.com", c1, c2, c3, <StatusBadge />, <RowActions />],
 });
 
 const DEFAULT_ROWS: ContentHubRow[] = [
-  makeRow(1, "marekm@kentico.com", "Tellus", "Augue"),
-  makeRow(2, "marekm@kentico.com", "Faucibus", "Non"),
-  makeRow(3, "marekm@kentico.com", "Dapibus", "Molesuada"),
-  makeRow(4, "marekm@kentico.com", "Consequat", "Lobortis"),
-  makeRow(5, "marekm@kentico.com", "Pharetra", "Vulputate"),
-  makeRow(6, "marekm@kentico.com", "Sagittis", "Cursus"),
+  makeRow(1, "Tellus", "Augue", "Neque"),
+  makeRow(2, "Faucibus", "Non", "Aliquam"),
+  makeRow(3, "Dapibus", "Malesuada", "Integer"),
+  makeRow(4, "Consequat", "Id", "Tortor"),
+  makeRow(5, "Lobortis", "Praesent", "Cras"),
 ];
 
 /* ----------------------------- Tree rendering ---------------------------- */
@@ -221,14 +224,31 @@ function TreeBranch({ node, depth }: { node: TreeNode; depth: number }) {
   );
 }
 
+/** Collapsible section header in the left navigator (e.g. "Smart folders"). */
+function TreeSection({ label }: { label: string }) {
+  return (
+    <div className="flex items-center justify-between px-2 py-1.5">
+      <span className="flex items-center gap-2 text-sm font-bold">
+        <ChevronDown className="h-4 w-4 shrink-0" strokeWidth={2.25} />
+        {label}
+      </span>
+      <button
+        type="button"
+        aria-label={`Add to ${label}`}
+        className="grid h-7 w-7 place-items-center rounded-xl border-2 border-transparent hover:border-black"
+      >
+        <Plus className="h-4 w-4" strokeWidth={2.5} />
+      </button>
+    </div>
+  );
+}
+
 /* -------------------------------- Template ------------------------------- */
 
 export function ContentHub({
-  title = "Coffee KX1 - Lesson 1",
-  callout = {
-    title: "Friendly warning",
-    body: "Heads up — this content item is referenced in several other places.",
-  },
+  title = "Heading",
+  // Optional — only rendered when a page supplies it.
+  callout,
   primaryAction = "PRIMARY ACTION",
   searchPlaceholder = "Search",
   appliedFilters = [
@@ -239,145 +259,159 @@ export function ContentHub({
   columns = DEFAULT_COLUMNS,
   rows = DEFAULT_ROWS,
   shortcuts = DEFAULT_SHORTCUTS,
+  smartFolders = DEFAULT_SMART_FOLDERS,
   folders = DEFAULT_FOLDERS,
   ...shellProps
 }: ContentHubProps) {
+  const shortcutClass = (active?: boolean) =>
+    `flex items-center gap-2 rounded-xl px-2 py-1.5 ${
+      active
+        ? "bg-black text-white"
+        : "border-2 border-transparent hover:border-black"
+    }`;
+
   return (
     <Shell {...shellProps}>
-      <div className="flex gap-6">
-        {/* LEFT — content tree navigator */}
-        <aside className="w-72 shrink-0 self-start rounded-xl border-2 border-black bg-background p-3">
-          {/* Top shortcuts */}
-          <ul className="flex flex-col gap-1">
-            {shortcuts.map((s) => (
-              <li key={s.label}>
-                <Link
-                  to="#"
-                  className={`flex items-center gap-2 rounded-xl px-2 py-1.5 ${
-                    s.active
-                      ? "bg-black text-white"
-                      : "border-2 border-transparent hover:border-black"
-                  }`}
-                >
-                  {s.icon}
-                  <span className="truncate">{s.label}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+      <div className="space-y-5">
+        {/* Full-width header block above the tree + listing columns */}
+        <h1 className="text-2xl font-bold">{title}</h1>
 
-          <div className="my-3 border-t-2 border-black" />
+        {/* Callout banner */}
+        {callout && (
+          <Callout
+            icon={TriangleAlert}
+            label={callout.label}
+            headline={callout.headline}
+            body={callout.body}
+          />
+        )}
 
-          {/* Folders heading + add */}
-          <div className="flex items-center justify-between px-2">
-            <span className="text-sm font-bold">Folders</span>
-            <button
-              type="button"
-              aria-label="Add folder"
-              className="grid h-7 w-7 place-items-center rounded-xl border-2 border-transparent hover:border-black"
-            >
-              <Plus className="h-4 w-4" strokeWidth={2.5} />
-            </button>
-          </div>
-
-          {/* Recursive tree */}
-          <ul className="mt-1 flex flex-col gap-1">
-            {folders.map((node, i) => (
-              <TreeBranch key={`${node.label}-${i}`} node={node} depth={0} />
-            ))}
-          </ul>
-        </aside>
-
-        {/* RIGHT — listing area */}
-        <div className="min-w-0 flex-1 space-y-5">
-          <h1 className="text-2xl font-bold">{title}</h1>
-
-          {/* Callout banner */}
-          {callout && (
-            <div className="flex items-start gap-3 rounded-xl border-2 border-black bg-muted px-4 py-3">
-              <TriangleAlert className="mt-0.5 h-5 w-5 shrink-0" strokeWidth={2.25} />
-              <div className="min-w-0">
-                <div className="font-bold">{callout.title}</div>
-                {callout.body && (
-                  <p className="text-muted-foreground">{callout.body}</p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Action row: primary action + search + filter */}
-          <div className="flex items-center gap-3">
-            <Button className="h-10 shrink-0 rounded-full px-6 text-xs font-bold tracking-wide">
+        {/* Action row: primary action + search + filter */}
+        <div className="flex items-center gap-3">
+          {/* Split button — primary action + a chevron segment for variants. */}
+          <div className="flex shrink-0">
+            <Button className="h-10 rounded-l-full rounded-r-none px-6 text-xs font-bold tracking-wide">
               {primaryAction}
             </Button>
-            <div className="relative flex-1">
-              <Input
-                placeholder={searchPlaceholder}
-                className="h-10 rounded-full border-2 border-black pl-6 pr-12"
-              />
-              <Search
-                className="absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2"
-                strokeWidth={2}
-              />
-            </div>
             <Button
-              variant="outline"
-              className="h-10 shrink-0 gap-2 rounded-full px-6 text-xs font-bold tracking-wide"
+              aria-label="More options"
+              className="h-10 rounded-l-none rounded-r-full border-l-2 border-l-white px-2"
             >
-              <Filter className="h-4 w-4" strokeWidth={2.25} />
-              FILTER
+              <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
             </Button>
           </div>
+          <div className="relative flex-1">
+            <Input
+              placeholder={searchPlaceholder}
+              className="h-10 rounded-full border-2 border-black pl-6 pr-12"
+            />
+            <Search
+              className="absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2"
+              strokeWidth={2}
+            />
+          </div>
+          <Button
+            variant="outline"
+            className="h-10 shrink-0 gap-2 rounded-full px-6 text-xs font-bold tracking-wide has-[>svg]:px-6"
+          >
+            <Filter className="h-4 w-4" strokeWidth={2.25} />
+            FILTER
+          </Button>
+        </div>
 
-          {/* Applied filters */}
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-muted-foreground">Applied filters:</span>
-            <button
-              type="button"
-              className="rounded-full text-xs font-bold tracking-wide underline"
+        {/* Applied filters */}
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="font-bold">Applied filters</span>
+          <button
+            type="button"
+            className="flex items-center gap-1 text-sm font-bold tracking-wide underline-offset-2 hover:underline"
+          >
+            <X className="h-3 w-3" strokeWidth={2.5} />
+            CLEAR ALL
+          </button>
+          {appliedFilters.map((f) => (
+            <Badge
+              key={f.label}
+              variant="outline"
+              className="gap-1 rounded-full px-3 py-1 text-sm"
             >
-              CLEAR ALL
-            </button>
-            {appliedFilters.map((f) => (
-              <span
-                key={f.label}
-                className="flex items-center gap-2 rounded-full border-2 border-black bg-black px-4 py-1.5 text-white"
-              >
-                {f.label}
-                <button type="button" aria-label="Remove filter" className="font-bold">
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
+              {f.label}
+              <X className="h-3 w-3" strokeWidth={2.5} />
+            </Badge>
+          ))}
+        </div>
 
-          {/* Item count + view toggles */}
-          <div className="flex items-center justify-between">
-            <span className="font-bold">{itemCount} items</span>
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                aria-label="Add column"
-                className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-black"
-              >
-                <Plus className="h-4 w-4" strokeWidth={2.25} />
-              </button>
-              <button
-                type="button"
-                aria-label="Grid view"
-                className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-black"
-              >
-                <LayoutGrid className="h-4 w-4" strokeWidth={2.25} />
-              </button>
-              <button
-                type="button"
-                aria-label="List view"
-                className="grid h-9 w-9 place-items-center rounded-xl bg-black text-white"
-              >
-                <List className="h-4 w-4" strokeWidth={2.25} />
-              </button>
+        {/* Tree navigator (left) + listing (right) */}
+        <div className="flex gap-6">
+          {/* LEFT — content tree navigator */}
+          <aside className="w-72 shrink-0 self-start rounded-xl border-2 border-black bg-background p-3">
+            {/* Standalone shortcuts */}
+            <ul className="flex flex-col gap-1">
+              {shortcuts.map((s) => (
+                <li key={s.label}>
+                  <Link to="#" className={shortcutClass(s.active)}>
+                    {s.icon}
+                    <span className="truncate">{s.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <div className="my-3 border-t-2 border-black" />
+
+            {/* Smart folders section */}
+            <TreeSection label="Smart folders" />
+            <ul className="mt-1 flex flex-col gap-1">
+              {smartFolders.map((s) => (
+                <li key={s.label}>
+                  <Link to="#" className={shortcutClass(s.active)}>
+                    {s.icon}
+                    <span className="truncate">{s.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <div className="my-3 border-t-2 border-black" />
+
+            {/* Folders section + recursive tree */}
+            <TreeSection label="Folders" />
+            <ul className="mt-1 flex flex-col gap-1">
+              {folders.map((node, i) => (
+                <TreeBranch key={`${node.label}-${i}`} node={node} depth={0} />
+              ))}
+            </ul>
+          </aside>
+
+          {/* RIGHT — listing area */}
+          <div className="min-w-0 flex-1 space-y-5">
+            {/* Item count + view toggles */}
+            <div className="flex items-center justify-between">
+              <span className="font-bold">{itemCount} items</span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  aria-label="Column settings"
+                  className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-black"
+                >
+                  <Settings className="h-4 w-4" strokeWidth={2.25} />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Grid view"
+                  className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-black"
+                >
+                  <LayoutGrid className="h-4 w-4" strokeWidth={2.25} />
+                </button>
+                <button
+                  type="button"
+                  aria-label="List view"
+                  className="grid h-9 w-9 place-items-center rounded-xl bg-black text-white"
+                >
+                  <List className="h-4 w-4" strokeWidth={2.25} />
+                </button>
+              </div>
             </div>
-          </div>
 
           {/* Data table */}
           <Table>
@@ -429,33 +463,25 @@ export function ContentHub({
           {/* Pagination */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
-              <button
-                type="button"
-                aria-label="Previous page"
-                className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-black"
-              >
-                <ChevronRight className="h-4 w-4 rotate-180" strokeWidth={2.25} />
-              </button>
-              {[1, 2, 3].map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  className={`grid h-9 min-w-9 place-items-center rounded-xl px-2 ${
-                    p === 1
-                      ? "bg-black text-white"
-                      : "border-2 border-transparent hover:border-black"
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
-              <span className="px-1">…</span>
-              <button
-                type="button"
-                className="grid h-9 min-w-9 place-items-center rounded-xl border-2 border-transparent px-2 hover:border-black"
-              >
-                40
-              </button>
+              {[1, "…", 556, 557, 558, "…", 3453].map((p, i) =>
+                p === "…" ? (
+                  <span key={`gap-${i}`} className="px-1">
+                    …
+                  </span>
+                ) : (
+                  <button
+                    key={p}
+                    type="button"
+                    className={`grid h-9 min-w-9 place-items-center rounded-xl px-2 ${
+                      p === 558
+                        ? "bg-black text-white"
+                        : "border-2 border-transparent hover:border-black"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ),
+              )}
               <button
                 type="button"
                 aria-label="Next page"
@@ -466,11 +492,12 @@ export function ContentHub({
             </div>
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground">Items per page</span>
-              <button className="flex h-10 items-center gap-2 rounded-xl border-2 border-black px-3 font-bold">
-                10
+              <button className="flex h-10 items-center gap-2 rounded-full border-2 border-black px-4 font-bold">
+                20
                 <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
               </button>
             </div>
+          </div>
           </div>
         </div>
       </div>

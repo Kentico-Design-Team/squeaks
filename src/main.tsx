@@ -13,6 +13,8 @@ import Pages from "./pages/pages";
 import Emails from "./pages/emails";
 import ActivityTypes from "./pages/activity-types";
 import ActivityTypeGeneral from "./pages/activity-type-general";
+import EditFormPage from "./pages/edit-form";
+import SecondaryNavShowcase from "./pages/secondary-nav-showcase";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -33,9 +35,14 @@ createRoot(document.getElementById("root")!).render(
           <Route path="pages" element={<Pages />} />
           <Route path="pages/:pageId/:tab" element={<Pages />} />
           <Route path="emails" element={<Emails />} />
-          <Route path="emails/:pageId/:tab" element={<Emails />} />
+          <Route path="emails/:tab" element={<Emails />} />
           <Route path="activity-types" element={<ActivityTypes />} />
           <Route path="activity-types/click" element={<ActivityTypeGeneral />} />
+          <Route path="edit-form" element={<EditFormPage />} />
+          <Route
+            path="secondary-nav-showcase"
+            element={<SecondaryNavShowcase />}
+          />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -44,7 +44,17 @@ export type ShellSubNav = {
 
 export type ShellProps = {
   children?: ReactNode;
+  /**
+   * Workspace selector label. Shown as the first header dropdown. Opt-in —
+   * omit for pages that don't support workspaces.
+   */
   workspace?: string;
+  /**
+   * Language selector label. Shown as the second header dropdown. Defaults to
+   * "English" — every page shows at least the language. Pass `language=""` for
+   * the rare page that isn't multilingual.
+   */
+  language?: string;
   breadcrumbs?: ShellBreadcrumb[];
   status?: string;
   actions?: ReactNode;
@@ -137,7 +147,8 @@ const DEFAULT_ACTIONS = (
 
 export function Shell({
   children,
-  workspace = "Kentico",
+  workspace,
+  language = "English",
   breadcrumbs,
   status = "Draft",
   actions = DEFAULT_ACTIONS,
@@ -232,7 +243,7 @@ export function Shell({
           tightRight: view-menu sits 24px from the AIRA rail (40+24) / panel. */}
       <div
         data-aira-open={airaOpen}
-        className={`grid h-screen grid-cols-1 grid-rows-[72px_1fr] pl-[96px] ${
+        className={`group/shell grid h-screen grid-cols-1 grid-rows-[72px_1fr] pl-[96px] ${
           tightRight
             ? "pr-[64px] data-[aira-open=true]:pr-[calc(var(--aira-panel)+24px)]"
             : "pr-[120px] data-[aira-open=true]:pr-[calc(var(--aira-panel)+80px)]"
@@ -241,10 +252,31 @@ export function Shell({
       {/* Top bar */}
       <header className="flex items-center justify-between gap-4 px-4">
         <div className="flex items-center gap-4">
-          <button className="flex h-10 items-center gap-2 rounded-xl border-2 border-black px-6 font-bold">
-            {workspace}
-            <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
-          </button>
+          {(workspace || language) && (
+            <div className="flex h-10 items-center rounded-xl border-2 border-black">
+              {workspace && (
+                <button
+                  type="button"
+                  className="flex h-full items-center gap-2 px-6 font-bold"
+                >
+                  {workspace}
+                  <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
+                </button>
+              )}
+              {language && (
+                <button
+                  type="button"
+                  className={`flex h-full items-center gap-2 px-6 font-bold ${
+                    workspace ? "border-l-2 border-black" : ""
+                  }`}
+                >
+                  <Globe className="h-4 w-4" strokeWidth={2.25} />
+                  {language}
+                  <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
+                </button>
+              )}
+            </div>
+          )}
 
           <div className="flex h-10 items-center gap-3 rounded-xl border-2 border-black px-4">
             <Link to="/" aria-label="Home">

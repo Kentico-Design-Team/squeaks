@@ -66,7 +66,7 @@ export function Aira({ open, onOpenChange, onWidthChange }: AiraProps) {
         aria-label="Resize AIRA panel"
         className="absolute top-0 bottom-0 left-0 z-10 w-2 -translate-x-1/2 cursor-ew-resize"
       />
-      <header className="flex items-center justify-between border-b-2 border-black px-4 py-4">
+      <header className="flex items-center justify-between px-4 py-4">
         <div className="flex items-center gap-3">
           <button type="button" aria-label="Menu">
             <Menu className="h-5 w-5" strokeWidth={2.25} />
@@ -78,7 +78,7 @@ export function Aira({ open, onOpenChange, onWidthChange }: AiraProps) {
             <SquarePen className="h-5 w-5" strokeWidth={2.25} />
           </button>
           <button type="button" aria-label="Close" onClick={() => onOpenChange(false)}>
-            <X className="h-5 w-5" strokeWidth={2.25} />
+            <X className="h-5 w-5 scale-125" strokeWidth={2.25} />
           </button>
         </div>
       </header>
@@ -108,8 +108,8 @@ export function Aira({ open, onOpenChange, onWidthChange }: AiraProps) {
         <p>Just remember, I&apos;m an AI chat, so I can make mistakes 😇</p>
       </div>
 
-      <div className="border-t-2 border-black p-4">
-        <div className="space-y-3 rounded-xl border-2 border-black px-4 py-3">
+      <div className="p-4">
+        <div className="space-y-3 rounded-[20px] border-2 border-black px-4 py-3">
           <Input
             placeholder="Ask AIRA"
             className="h-8 border-0 px-0 shadow-none focus-visible:ring-0"

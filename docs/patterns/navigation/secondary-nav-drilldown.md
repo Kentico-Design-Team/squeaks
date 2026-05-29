@@ -1,11 +1,13 @@
 # Secondary navigation (drill-down)
 
-Component: `@/components/custom/secondary-nav` (`SecondaryNav`). Used by the `listing` and `overview` templates via the `secondaryNav` prop.
+Component: `@/components/custom/secondary-nav` (`SecondaryNav`). Used by the `listing`, `overview`, and `edit-form` templates via the `secondaryNav` prop. Fixed width **224px** (`w-56`) everywhere.
 
 ## Rules
 
 - One section header only (title + trailing rule). No duplicated section title, no subheadings. The page body has a single `<h1>`.
 - A `children` section renders **inline directly beneath its parent item** (opening an object on the "Item 1" page inserts its section between Item 1 and Item 2), not appended at the end. Nest arbitrarily deep.
+- Each nested level is a **rounded, padded box outlined with a 2px black border** (no fill, no shading). Nesting reads as borders within borders. The root section has no box.
+- **Left padding is always twice the right** at every level, including the root `<aside>` box. Keep the left padding as-is and halve the right (`pl-4`/`pr-2` on the root, `pl-3`/`pr-1.5` on nested boxes).
 - Opening an object (table row, card, …) attaches its section as `children` of the currently **active** item. The nested section's `title` is the opened object's own name.
 - First sub-item is active by default when a level opens. The highlighted item is always the deepest current page — the parent un-highlights once you drill in.
 - Body swaps with the nav: opening an object replaces the body with that object's own content; each sub-item shows different content (or a blank placeholder). In `listing`, pass the swapped body via the `content` prop (replaces heading/toolbar/table, keeps shell + nav). Breadcrumb grows with the drill path.

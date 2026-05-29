@@ -6,6 +6,7 @@ import {
   AlignCenter,
   AlignLeft,
   AlignRight,
+  Bell,
   Bold,
   Calendar,
   Check,
@@ -25,6 +26,7 @@ import {
   Link2,
   List,
   ListOrdered,
+  MessageSquare,
   Pencil,
   Pilcrow,
   Redo2,
@@ -49,7 +51,7 @@ const Actions = (
       </Button>
       <Button
         aria-label="Workflow options"
-        className="-ml-0.5 h-10 rounded-l-none rounded-r-full px-2"
+        className="h-10 rounded-l-none rounded-r-full border-l-2 border-l-white px-2"
       >
         <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
       </Button>
@@ -123,14 +125,14 @@ function ContentTab({ page }: EditorContentContext) {
             <div className="flex items-center gap-3">
               <Button
                 variant="outline"
-                className="h-10 rounded-full px-5 text-xs font-bold tracking-wide"
+                className="h-10 rounded-full px-6 text-xs font-bold tracking-wide"
               >
                 SELECT CONTENT ITEM
               </Button>
               <span className="text-sm">or</span>
               <Button
                 variant="outline"
-                className="h-10 rounded-full px-5 text-xs font-bold tracking-wide"
+                className="h-10 rounded-full px-6 text-xs font-bold tracking-wide"
               >
                 CREATE NEW
               </Button>
@@ -243,6 +245,55 @@ function ContentTab({ page }: EditorContentContext) {
   );
 }
 
+function CommentsPanel() {
+  return (
+    <div className="space-y-4">
+      <p className="text-muted-foreground">
+        Leave notes for your teammates about this page. Comments are only visible
+        in the editor and never published.
+      </p>
+      <div className="space-y-1">
+        <FieldLabel>New comment</FieldLabel>
+        <Textarea
+          placeholder="Write a comment…"
+          className="min-h-24 rounded-[20px]"
+        />
+      </div>
+      <Button className="h-10 rounded-full px-6 text-xs font-bold tracking-wide">
+        ADD COMMENT
+      </Button>
+    </div>
+  );
+}
+
+function RemindersPanel() {
+  return (
+    <div className="space-y-4">
+      <p className="text-muted-foreground">
+        Schedule a reminder to revisit this page — for a content refresh, a
+        seasonal update, or a fact check.
+      </p>
+      <label className="block space-y-1">
+        <FieldLabel>Remind me on</FieldLabel>
+        <div className="relative">
+          <Input defaultValue="6/30/2026" className="h-12 rounded-full pl-5 pr-12" />
+          <Calendar
+            className="absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2"
+            strokeWidth={2.25}
+          />
+        </div>
+      </label>
+      <label className="block space-y-1">
+        <FieldLabel>Note</FieldLabel>
+        <Textarea
+          placeholder="What should be checked?"
+          className="min-h-20 rounded-[20px]"
+        />
+      </label>
+    </div>
+  );
+}
+
 const PAGES_TREE = [
   {
     label: "Dancing Goat Pages",
@@ -312,7 +363,17 @@ export default function Pages() {
       treeItems={PAGES_TREE}
       tabs={[
         { icon: Eye, slug: "preview", label: "Preview" },
-        { icon: FileText, slug: "content", label: "Content", content: ContentTab },
+        {
+          icon: FileText,
+          slug: "content",
+          label: "Content",
+          content: ContentTab,
+          ownHeading: true,
+          sideMenu: [
+            { icon: MessageSquare, slug: "comments", label: "Comments", content: <CommentsPanel /> },
+            { icon: Bell, slug: "reminders", label: "Reminders", content: <RemindersPanel /> },
+          ],
+        },
         { icon: LayoutGrid, slug: "page-builder", label: "Page Builder" },
         { icon: FlaskConical, slug: "experiment", label: "Experiment" },
         { icon: LinkIcon, slug: "used-in", label: "Used in" },

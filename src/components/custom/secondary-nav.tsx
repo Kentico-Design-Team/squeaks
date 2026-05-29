@@ -56,13 +56,20 @@ function Item({ item }: { item: SecondaryNavItem }) {
 
 function Section({
   section,
-  nested,
+  depth = 0,
 }: {
   section: SecondaryNavSection;
-  nested?: boolean;
+  /** Nesting level. 0 = root (no box); each deeper level is a bordered box. */
+  depth?: number;
 }) {
+  const nested = depth > 0;
+
   return (
-    <div className={nested ? "mt-2 rounded-xl border-2 border-black p-3" : ""}>
+    <div
+      className={
+        nested ? "mt-2 rounded-xl border-2 border-black py-3 pl-3 pr-1.5" : ""
+      }
+    >
       <div className="flex items-center gap-2">
         <span className="whitespace-nowrap text-sm font-bold">
           {section.title}
@@ -73,7 +80,9 @@ function Section({
         {section.items.map((item) => (
           <li key={item.label}>
             <Item item={item} />
-            {item.children && <Section section={item.children} nested />}
+            {item.children && (
+              <Section section={item.children} depth={depth + 1} />
+            )}
           </li>
         ))}
       </ul>
@@ -83,7 +92,7 @@ function Section({
 
 export function SecondaryNav({ nav }: { nav: SecondaryNavData }): ReactNode {
   return (
-    <aside className="w-64 shrink-0 self-start rounded-xl border-2 border-black bg-background p-4">
+    <aside className="w-56 shrink-0 self-start rounded-xl border-2 border-black bg-background py-4 pl-4 pr-2">
       <Section section={nav} />
     </aside>
   );
