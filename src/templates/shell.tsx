@@ -278,7 +278,7 @@ export function Shell({
               />
               <Input
                 placeholder="Search for all applications"
-                className="h-11 rounded-full pl-11 pr-4"
+                className="h-10 rounded-full pl-11 pr-4"
               />
             </div>
 

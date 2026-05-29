@@ -78,6 +78,15 @@ src/pages/
 - Don't add comments explaining obvious layout code
 - Don't refactor or "clean up" prototype pages unless asked
 
+## Templates & custom components
+
+- **Layout templates** live in `src/templates/` — e.g. `shell` (app chrome — sidebar, top bar, AIRA rail), `listing`, `editor`. Check the folder for the full set. Build pages by wrapping content in a template; editing a template propagates to every page using it.
+- **Custom (non-Shadcn) components** go in `src/components/custom/` — never in `src/components/ui/`.
+
+## Design patterns
+
+Patterns that have been explicitly specified or corrected are documented in `docs/patterns/` — one file per pattern. Check the folder before re-implementing a pattern (e.g. secondary navigation drill-down).
+
 ## Available Shadcn components
 
 All standard Shadcn UI components are installed and available at `@/components/ui/`:
