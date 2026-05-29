@@ -1,6 +1,6 @@
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { Link } from "react-router";
-import { Aira, AIRA_PANEL_DEFAULT_WIDTH } from "@/components/aira";
+import { Aira, AIRA_PANEL_DEFAULT_WIDTH } from "@/components/custom/aira";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
