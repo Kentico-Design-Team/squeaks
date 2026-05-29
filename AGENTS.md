@@ -14,7 +14,7 @@ No backend. No database. No API calls. Everything is frontend-only with static p
 
 ## Core rules
 
-- **Monochrome only** — black, white, and grays. No colors unless the user explicitly asks
+- **Monochrome only** — black, white. No greys, no colors unless the user explicitly asks
 - **Comic Neue font** — don't change it. It signals "this is a mockup"
 - **Use Shadcn UI components** from `@/components/ui/` — don't install new UI libraries
 - **Don't modify `src/components/ui/`** — these are Shadcn defaults
@@ -45,18 +45,17 @@ Use React Router (`react-router`). All routing is client-side.
 **Version pattern** — users often want to compare approaches:
 
 ```
-/v1/dashboard    ← version 1
-/v2/dashboard    ← version 2 with different layout
+/dashboard       ← version 1
+/dashboard-v2    ← version 2 with different layout
 ```
 
 Organize versioned pages in matching folders:
 
 ```
 src/pages/
-├── v1/
-│   └── dashboard.tsx
-└── v2/
+└── dashboard/
     └── dashboard.tsx
+    └── dashboard-v2.tsx
 ```
 
 ## When the user shares a wireframe or idea

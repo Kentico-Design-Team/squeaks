@@ -84,6 +84,9 @@
   body {
     @apply bg-background text-foreground;
     font-family: "Comic Neue", cursive, system-ui;
+    /* Default text size: 14px. CAPS text uses text-xs (12px); headings opt into larger sizes. */
+    font-size: 0.875rem;
+    line-height: 1.25rem;
   }
   /* Thicken all border utilities to 2px */
   .border {
