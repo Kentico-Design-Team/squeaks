@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Shell } from "@/templates/shell";
 import { SecondaryNav } from "@/components/custom/secondary-nav";
+import { RecordColumn } from "@/components/custom/record-column";
 import { BarItem, BarItemList, Shelf } from "@/components/custom/bar-item";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -134,46 +135,26 @@ export default function BarItemPage() {
           }}
         />
 
-        {/* Same column widths as the edit-form template, but with no bordered
-            content wrapper — just the bar items at the content-wrapper width.
-
-            -mt-6 pulls the column up into the shell's 24px top padding so the
-            cap below can fill that strip — otherwise scrolling content shows
-            through it, above the toolbar. */}
-        <div className="-mt-6 min-w-0 flex-1 min-[1281px]:pr-[232px]">
-          <div className="max-w-full min-[1281px]:max-w-[83.33%] min-[1920px]:max-w-[66.66%]">
-            {/* Invisible top edge — an opaque cap pinned to the very top of the
-                content area, level with the secondary-nav top edge. Fills the
-                shell's top padding strip so the heading and field rows scroll
-                up and vanish behind it instead of peeking above the toolbar. */}
-            <div
-              aria-hidden
-              className="pointer-events-none sticky -top-6 z-20 h-6 bg-background"
-            />
-
-            <h1 className="text-base font-bold">Fields</h1>
-
-            {/* Action toolbar — sticks to the top edge while the page scrolls
-                (the heading scrolls away behind the cap), exactly like the
-                edit-form toolbar. The band's background + 24px bottom padding
-                stay opaque so the field rows scroll cleanly under it; mt-4
-                keeps the 16px gap from the heading. */}
-            <div className="sticky top-0 z-10 mt-4 bg-background pb-6">
-              <div className="flex items-center gap-3">
-                <Button className="h-10 rounded-full px-6 text-xs font-bold tracking-wide">
-                  NEW FIELD
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-10 rounded-full px-6 text-xs font-bold tracking-wide"
-                >
-                  ADD REUSABLE FIELD SCHEMA
-                </Button>
-              </div>
-            </div>
-
-            {/* Draggable, deletable field rows — grab a handle to reorder. */}
-            <BarItemList items={fields} onReorder={setFields}>
+        {/* Same column as the edit-form template (shared RecordColumn), but
+            unbordered — the bar items sit directly at the content width. */}
+        <RecordColumn
+          heading="Fields"
+          toolbar={
+            <>
+              <Button className="h-10 rounded-full px-6 text-xs font-bold tracking-wide">
+                NEW FIELD
+              </Button>
+              <Button
+                variant="outline"
+                className="h-10 rounded-full px-6 text-xs font-bold tracking-wide"
+              >
+                ADD REUSABLE FIELD SCHEMA
+              </Button>
+            </>
+          }
+        >
+          {/* Draggable, deletable field rows — grab a handle to reorder. */}
+          <BarItemList items={fields} onReorder={setFields}>
               {fields.map((id) =>
                 id === "SEOFields" ? (
                   <Shelf
@@ -283,8 +264,7 @@ export default function BarItemPage() {
                 )}
               </BarItemList>
             </div>
-          </div>
-        </div>
+        </RecordColumn>
       </div>
     </Shell>
   );

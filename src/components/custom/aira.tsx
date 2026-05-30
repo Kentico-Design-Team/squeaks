@@ -3,7 +3,7 @@ import {
   Image as ImageIcon,
   Menu,
   Send,
-  Sparkle,
+  Sparkles,
   SquarePen,
   X,
 } from "lucide-react";
@@ -46,7 +46,7 @@ export function Aira({ open, onOpenChange, onWidthChange }: AiraProps) {
         aria-label="Open AIRA"
         className="fixed top-0 right-0 bottom-0 z-30 flex w-[40px] flex-col items-center gap-3 border-l-2 border-black bg-background py-4"
       >
-        <Sparkle className="h-5 w-5" strokeWidth={2.25} />
+        <Sparkles className="h-5 w-5" strokeWidth={2.25} />
         <div className="flex flex-col items-center gap-1 text-base font-bold leading-none tracking-wide">
           <span>A</span>
           <span>I</span>

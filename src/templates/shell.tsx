@@ -13,26 +13,61 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
+  Bell,
+  Boxes,
   ChevronDown,
   ChevronRight,
+  Clock,
   Cloud,
+  Code,
+  Cog,
+  Columns2,
+  Contact,
   Copy,
-  FileText,
+  Database,
+  DollarSign,
+  FileUser,
+  FolderTree,
+  FormInput,
+  GitBranch,
+  GitFork,
   Globe,
+  HeartHandshake,
   House,
-  Image as ImageIcon,
+  IdCard,
+  Images,
+  Languages,
   LayoutGrid,
+  LayoutTemplate,
   List,
   Mail,
-  Menu,
+  Mails,
+  Megaphone,
+  Network,
+  Newspaper,
+  Package,
+  Percent,
+  PieChart,
   Puzzle,
+  RefreshCw,
+  Route,
+  ScrollText,
   Search,
   Settings,
+  Shapes,
   Share2,
-  Sparkle,
+  ShieldCheck,
+  ShoppingCart,
+  Sparkles,
+  SquareArrowOutUpRight,
+  SquareUser,
+  Store,
   Trash2,
+  Unlink,
+  UserCheck,
   Users,
   User,
+  Workflow,
 } from "lucide-react";
 
 export type ShellBreadcrumb = {
@@ -41,8 +76,11 @@ export type ShellBreadcrumb = {
 };
 
 export type ShellNavId =
+  | "channels"
   | "content"
   | "marketing"
+  | "customer-data"
+  | "commerce"
   | "development"
   | "configuration";
 
@@ -83,61 +121,126 @@ export type ShellProps = {
   fitHeight?: boolean;
 };
 
-const NAV: { id: ShellNavId; label: string; icon: typeof Menu; href: string }[] =
-  [
-    { id: "content", label: "Content management", icon: Menu, href: "/" },
-    {
-      id: "marketing",
-      label: "Digital marketing",
-      icon: Share2,
-      href: "/marketing",
-    },
-    {
-      id: "development",
-      label: "Development",
-      icon: Sparkle,
-      href: "/development",
-    },
-    {
-      id: "configuration",
-      label: "Configuration",
-      icon: Settings,
-      href: "/configuration",
-    },
-  ];
+type NavIcon = ComponentType<{ className?: string; strokeWidth?: number }>;
+
+const NAV: { id: ShellNavId; label: string; icon: NavIcon; href: string }[] = [
+  { id: "channels", label: "Channels", icon: Share2, href: "/channels" },
+  {
+    id: "content",
+    label: "Content management",
+    icon: Network,
+    href: "/",
+  },
+  {
+    id: "marketing",
+    label: "Digital marketing",
+    icon: Store,
+    href: "/marketing",
+  },
+  {
+    id: "customer-data",
+    label: "Customer data management",
+    icon: Database,
+    href: "/customer-data",
+  },
+  {
+    id: "commerce",
+    label: "Digital commerce",
+    icon: ShoppingCart,
+    href: "/commerce",
+  },
+  {
+    id: "development",
+    label: "Development",
+    icon: Code,
+    href: "/development",
+  },
+  {
+    id: "configuration",
+    label: "Configuration",
+    icon: Settings,
+    href: "/configuration",
+  },
+];
 
 const DEFAULT_SUB_NAV: Record<ShellNavId, ShellSubNav> = {
+  channels: {
+    title: "Channels",
+    items: [
+      { icon: Mail, label: "Emails" },
+      { icon: Cloud, label: "Headless channel" },
+      { icon: Globe, label: "Web pages" },
+    ],
+  },
   content: {
     title: "Content management",
     items: [
-      { icon: FileText, label: "Pages" },
-      { icon: FileText, label: "Articles" },
-      { icon: ImageIcon, label: "Media libraries" },
+      { icon: Boxes, label: "Content hub" },
+      { icon: Images, label: "Media libraries" },
+      { icon: LayoutTemplate, label: "Preset templates" },
       { icon: Trash2, label: "Recycle bin" },
+      { icon: Unlink, label: "URLs" },
     ],
   },
   marketing: {
-    title: "Channels",
+    title: "Digital marketing",
     items: [
-      { icon: Mail, label: "Dancing Goat Emails" },
-      { icon: FileText, label: "Dancing Goat Pages" },
-      { icon: Cloud, label: "Headless" },
+      { icon: Workflow, label: "Automation" },
+      { icon: Megaphone, label: "Campaigns" },
+      { icon: Contact, label: "Contact groups" },
+      { icon: IdCard, label: "Contact management" },
+      { icon: SquareArrowOutUpRight, label: "Cross-site tracking" },
+      { icon: Route, label: "Customer journeys" },
+      { icon: FormInput, label: "Forms" },
+      { icon: SquareUser, label: "Members" },
+      { icon: UserCheck, label: "Recipient lists" },
+    ],
+  },
+  "customer-data": {
+    title: "Customer data management",
+    items: [
+      { icon: IdCard, label: "Profiles" },
+      { icon: PieChart, label: "Segments" },
+    ],
+  },
+  commerce: {
+    title: "Digital commerce",
+    items: [
+      { icon: HeartHandshake, label: "Customers" },
+      { icon: DollarSign, label: "Orders" },
+      { icon: Percent, label: "Promotions" },
     ],
   },
   development: {
     title: "Development",
     items: [
-      { icon: List, label: "Event log" },
+      { icon: ScrollText, label: "Event log" },
       { icon: Puzzle, label: "Modules" },
-      { icon: Settings, label: "System" },
+      { icon: Clock, label: "Scheduled tasks" },
+      { icon: Shapes, label: "System" },
     ],
   },
   configuration: {
     title: "Configuration",
     items: [
+      { icon: Sparkles, label: "AIRA" },
+      { icon: Share2, label: "Channel management" },
+      { icon: ShoppingCart, label: "Commerce configuration" },
+      { icon: RefreshCw, label: "Content synchronization" },
+      { icon: Package, label: "Content types" },
+      { icon: GitFork, label: "Customer data management" },
+      { icon: FileUser, label: "Data protection" },
+      { icon: Mails, label: "Email queue" },
+      { icon: Newspaper, label: "Email templates" },
+      { icon: Languages, label: "Languages" },
+      { icon: Bell, label: "Notifications" },
+      { icon: ShieldCheck, label: "Role management" },
+      { icon: Cog, label: "Settings" },
+      { icon: FolderTree, label: "Taxonomies" },
+      { icon: Languages, label: "Translation queue" },
       { icon: Users, label: "Users" },
-      { icon: Globe, label: "Sites" },
-      { icon: Settings, label: "Settings" },
+      { icon: GitBranch, label: "Workflows" },
+      { icon: Columns2, label: "Workspaces" },
     ],
   },
 };

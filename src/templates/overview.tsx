@@ -6,6 +6,7 @@ import {
   SecondaryNav,
   type SecondaryNavData,
 } from "@/components/custom/secondary-nav";
+import { RecordColumn } from "@/components/custom/record-column";
 import { Lightbulb } from "lucide-react";
 import { Callout } from "@/components/custom/callout";
 
@@ -67,30 +68,32 @@ export function Overview({
         {/* Left secondary menu panel */}
         <SecondaryNav nav={secondaryNav} />
 
-        {/* Right content column */}
-        <div className="flex flex-1 flex-col gap-4">
-          <h1 className="text-base font-bold">{title}</h1>
+        {/* Right content column — shares RecordColumn's responsive width steps
+            with the edit-form template. The callout sits between the heading and
+            the action, so it can't use the toolbar slot; heading + body live here. */}
+        <RecordColumn heading={title}>
+          <div className="mt-4 flex flex-col gap-4">
+            {/* Quick tip callout */}
+            <Callout
+              icon={Lightbulb}
+              label={callout.label}
+              headline={callout.title}
+              body={callout.body}
+            />
 
-          {/* Quick tip callout */}
-          <Callout
-            icon={Lightbulb}
-            label={callout.label}
-            headline={callout.title}
-            body={callout.body}
-          />
+            {/* Primary action — 24px below it before the content region (gap-4 + mb-2). */}
+            <div className="mb-2">
+              <Button className="h-10 rounded-full px-6 text-xs font-bold tracking-wide">
+                {primaryActionLabel}
+              </Button>
+            </div>
 
-          {/* Primary action — 24px below it before the content region (gap-4 + mb-2). */}
-          <div className="mb-2">
-            <Button className="h-10 rounded-full px-6 text-xs font-bold tracking-wide">
-              {primaryActionLabel}
-            </Button>
+            {/* Large empty bordered region */}
+            <div className="min-h-80 rounded-xl border-2 border-black">
+              {children}
+            </div>
           </div>
-
-          {/* Large empty bordered region */}
-          <div className="min-h-80 flex-1 rounded-xl border-2 border-black">
-            {children}
-          </div>
-        </div>
+        </RecordColumn>
       </div>
     </Shell>
   );

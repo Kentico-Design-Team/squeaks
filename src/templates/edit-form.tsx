@@ -4,6 +4,7 @@ import {
   SecondaryNav,
   type SecondaryNavData,
 } from "@/components/custom/secondary-nav";
+import { RecordColumn } from "@/components/custom/record-column";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -277,55 +278,20 @@ export function EditForm({
       <div className="flex gap-6">
         {secondaryNav && <SecondaryNav nav={secondaryNav} sticky />}
 
-        {/* Form column max-width steps with the viewport: 100% ≤1280px,
-            83.33% on 1281–1919px, 66.66% ≥1920px. Above 1280px a 232px right
-            gap is reserved outside that 100% (pr on the parent, % on the
-            child); ≤1280px there's no right gap.
-
-            -mt-6 pulls the column up into the shell's 24px top padding so the
-            cap below can fill that strip — otherwise scrolling content shows
-            through it, above the toolbar. */}
-        <div className="-mt-6 min-w-0 flex-1 min-[1281px]:pr-[232px]">
-          <div className="max-w-full min-[1281px]:max-w-[83.33%] min-[1920px]:max-w-[66.66%]">
-            {/* Invisible top edge — an opaque cap pinned to the very top of the
-                content area, level with the secondary-nav top edge. Fills the
-                shell's top padding strip so the heading and content box scroll
-                up and vanish behind it instead of peeking above the toolbar. */}
-            <div
-              aria-hidden
-              className="pointer-events-none sticky -top-6 z-20 h-6 bg-background"
-            />
-
-            <h1 className="text-base font-bold">{heading}</h1>
-
-            {/* Action toolbar — left-aligned, above the content box. Sticky:
-                pins to the top edge while the page scrolls (the heading scrolls
-                away behind the cap). The band's background + 24px bottom padding
-                stay opaque, so the content box scrolls cleanly under it instead
-                of showing through. mt-4 keeps the 16px gap from the heading. */}
-            {formActions && (
-              <div className="sticky top-0 z-10 mt-4 bg-background pb-6">
-                <div className="flex items-center gap-3">{formActions}</div>
-              </div>
-            )}
-
-            {/* Content area — bordered box with 32px inner padding. */}
-            <div className="space-y-6 rounded-xl border-2 border-black p-8">
-              {recordTitle && (
-                <div className="flex items-center gap-2">
-                  <span className="text-base font-bold">{recordTitle}</span>
-                  <button type="button" aria-label="Rename">
-                    <Pencil className="h-4 w-4" strokeWidth={2.25} />
-                  </button>
-                </div>
-              )}
-
-              {groupLabel && <h2 className="font-bold">{groupLabel}</h2>}
-
-              {fields}
+        <RecordColumn heading={heading} toolbar={formActions} bordered>
+          {recordTitle && (
+            <div className="flex items-center gap-2">
+              <span className="text-base font-bold">{recordTitle}</span>
+              <button type="button" aria-label="Rename">
+                <Pencil className="h-4 w-4" strokeWidth={2.25} />
+              </button>
             </div>
-          </div>
-        </div>
+          )}
+
+          {groupLabel && <h2 className="font-bold">{groupLabel}</h2>}
+
+          {fields}
+        </RecordColumn>
       </div>
     </Shell>
   );

@@ -370,12 +370,12 @@ export function Editor({
         </div>
 
         {/* Side panel — overlays the page when a side-menu item is open.
-            648px wide; SIDE_PANEL_POSITION_SIDE_MENU docks it 8px left of the
+            644px wide; SIDE_PANEL_POSITION_SIDE_MENU docks it 8px left of the
             88px view-menu column (see side-panel.tsx for the shared geometry). */}
         {activeSideItem && (
-          <div className={`${SIDE_PANEL_POSITION_SIDE_MENU} flex w-[648px] flex-col rounded-xl border-2 border-black bg-background`}>
+          <div className={`${SIDE_PANEL_POSITION_SIDE_MENU} flex w-[644px] flex-col rounded-xl border-2 border-black bg-background`}>
             <header className="flex items-center justify-between px-6 py-4">
-              <h2 className="text-xl font-bold">{activeSideItem.label}</h2>
+              <h2 className="text-base font-bold">{activeSideItem.label}</h2>
               <button
                 type="button"
                 aria-label="Close panel"

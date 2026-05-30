@@ -151,9 +151,9 @@ export function SidePanel({
       </Button>
 
       {open && (
-        <div className={`${SIDE_PANEL_POSITION} flex w-[480px] flex-col rounded-xl border-2 border-black bg-background`}>
+        <div className={`${SIDE_PANEL_POSITION} flex w-[644px] flex-col rounded-xl border-2 border-black bg-background`}>
           <header className="flex items-center justify-between px-6 py-4">
-            <h2 className="text-xl font-bold">{title}</h2>
+            <h2 className="text-base font-bold">{title}</h2>
             <button
               type="button"
               aria-label="Close panel"
@@ -172,7 +172,8 @@ export function SidePanel({
             ))}
           </div>
 
-          <footer className="flex justify-end gap-3 border-t-2 border-black px-6 py-4">
+          {/* Destructive action (CLEAR ALL) pinned far-left; secondary CANCEL + primary APPLY far-right. */}
+          <footer className="flex justify-between gap-3 border-t-2 border-black px-6 py-4">
             <Button
               variant="outline"
               className="h-10 shrink-0 gap-2 rounded-full px-6 text-xs font-bold tracking-wide has-[>svg]:px-6"
@@ -180,12 +181,21 @@ export function SidePanel({
               <X className="h-3 w-3" strokeWidth={2.5} />
               CLEAR ALL
             </Button>
-            <Button
-              onClick={() => setOpen(false)}
-              className="h-10 rounded-full px-6 text-xs font-bold tracking-wide"
-            >
-              APPLY FILTERS
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setOpen(false)}
+                className="h-10 rounded-full px-6 text-xs font-bold tracking-wide"
+              >
+                CANCEL
+              </Button>
+              <Button
+                onClick={() => setOpen(false)}
+                className="h-10 rounded-full px-6 text-xs font-bold tracking-wide"
+              >
+                APPLY
+              </Button>
+            </div>
           </footer>
         </div>
       )}

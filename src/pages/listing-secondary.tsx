@@ -1,20 +1,6 @@
-import { Link, useParams } from "react-router";
-import { Listing, StatusBadge, TagBadge } from "@/templates/listing";
-import { RowActions } from "@/components/custom/row-actions";
+import { useParams } from "react-router";
+import { Overview } from "@/templates/overview";
 import type { SecondaryNavData } from "@/components/custom/secondary-nav";
-
-const EMAILS = [
-  "mvonderlin@kentico.com",
-  "lschuster@kentico.com",
-  "phayes@kentico.com",
-  "bcarroll@kentico.com",
-  "twheeler@kentico.com",
-  "rmccoy@kentico.com",
-];
-
-const COL_A = ["Tellus", "Faucibus", "Dapibus", "Consequat", "Lobortis", "Aliquam"];
-const COL_B = ["Augue", "Nec", "Malesuada", "Id", "Praesent", "Vitae"];
-const COL_C = ["Neque", "Aliquam", "Integer", "Tortor", "Cras", "Lectus"];
 
 const TABS = [
   { slug: "overview", label: "Overview" },
@@ -27,12 +13,11 @@ const BASE = "/listing-secondary";
 export default function ListingSecondary() {
   // Drill state comes from the URL, so every page/sub-page is reflected there
   // (shareable links, working back button):
-  //   /listing-secondary                 → the "Item 1" table
+  //   /listing-secondary                 → the "Item 1" page
   //   /listing-secondary/3/overview      → object #3, Overview sub-page
   const { itemId, tab } = useParams();
   const openedId = itemId ? Number(itemId) : null;
-  const opened =
-    openedId && EMAILS[openedId - 1] ? EMAILS[openedId - 1] : null;
+  const opened = openedId ? `Item ${openedId}` : null;
   const activeTab = TABS.find((t) => t.slug === tab) ?? TABS[0];
 
   const nav: SecondaryNavData = {
@@ -59,14 +44,11 @@ export default function ListingSecondary() {
     ],
   };
 
-  // The body swaps with the navigation: the table is the "Item 1" page; opening
-  // a row (or switching sub-tabs) shows that object's own page content instead.
+  // The body swaps with the navigation: the default page is "Item 1"; opening a
+  // sub-tab shows that object's own page content instead.
   const body = opened ? (
-    <div className="space-y-4">
-      <h1 className="text-base font-bold">{activeTab.label}</h1>
-      <div className="grid min-h-96 place-items-center rounded-xl border-2 border-black text-muted-foreground">
-        {activeTab.label} content
-      </div>
+    <div className="grid h-full min-h-80 place-items-center text-muted-foreground">
+      {activeTab.label} content
     </div>
   ) : undefined;
 
@@ -81,74 +63,21 @@ export default function ListingSecondary() {
     : [{ label: "Listing" }, { label: "Secondary menu" }];
 
   return (
-    <Listing
-      title="Heading"
-      heading="Heading"
+    <Overview
+      title={opened ? activeTab.label : "Heading"}
       breadcrumbs={breadcrumbs}
       status=""
       actions={null}
       activeNav="content"
-      searchPlaceholder="Search"
       secondaryNav={nav}
-      content={body}
       callout={{
         label: "Friendly warning",
-        headline: "Headline (optional)",
+        title: "Headline (optional)",
         body: "Body (mandatory)",
       }}
-      primaryAction={{ label: "PRIMARY ACTION" }}
-      showFilter
-      filterFields={[
-        { type: "text", label: "Email" },
-        {
-          type: "checkbox",
-          label: "Content type",
-          options: ["Article", "Cafe", "Image", "Event", "Blog post"],
-        },
-        {
-          type: "select",
-          label: "Status",
-          options: ["Published", "Draft", "Scheduled", "Unpublished"],
-        },
-      ]}
-      appliedFilters={[
-        "Content type: Article, Cafe, Image, Event, Blog post…",
-        "Status: Published",
-      ]}
-      selectable
-      columns={[
-        { label: "Default column" },
-        { label: "Default column" },
-        { label: "Default column" },
-        { label: "Default column" },
-        { label: "Status" },
-        { label: "Default column" },
-        { label: "Actions", align: "right", cellAlign: "right", width: "w-24" },
-      ]}
-      rows={EMAILS.map((email, i) => ({
-        id: i + 1,
-        cells: [
-          <Link
-            to={`${BASE}/${i + 1}/overview`}
-            className="text-left font-bold hover:underline"
-          >
-            {email}
-          </Link>,
-          COL_A[i],
-          COL_B[i],
-          COL_C[i],
-          <StatusBadge />,
-          <TagBadge />,
-          <RowActions />,
-        ],
-      }))}
-      pagination={{
-        totalItems: 330,
-        pages: [1, "…", 354, 355, 356, 357, "…", 8169],
-        current: 356,
-        perPage: 200,
-        perPageOptions: [25, 50, 100, 200],
-      }}
-    />
+      primaryActionLabel="PRIMARY ACTION"
+    >
+      {body}
+    </Overview>
   );
 }
