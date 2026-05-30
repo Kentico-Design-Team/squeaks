@@ -153,7 +153,7 @@ const DEFAULT_FIELDS = (
     {/* Product name */}
     <label className="block space-y-1">
       <FieldLabel>Product name</FieldLabel>
-      <Input defaultValue="Ethiopia Yirgacheffe (draft)" className="h-12 rounded-full px-5" />
+      <Input defaultValue="Ethiopia Yirgacheffe (draft)" className="h-10 rounded-full px-5" />
     </label>
 
     {/* Product description */}
@@ -255,7 +255,7 @@ const DEFAULT_FIELDS = (
     {/* Product price */}
     <label className="block space-y-1">
       <FieldLabel>Product price</FieldLabel>
-      <Input defaultValue="3.5" className="h-12 rounded-full px-5" />
+      <Input defaultValue="3.5" className="h-10 rounded-full px-5" />
       <span className="text-sm text-muted-foreground">Enter price in US Dollar</span>
     </label>
   </>
@@ -280,20 +280,32 @@ export function EditForm({
         {/* Form column max-width steps with the viewport: 100% ≤1280px,
             83.33% on 1281–1919px, 66.66% ≥1920px. Above 1280px a 232px right
             gap is reserved outside that 100% (pr on the parent, % on the
-            child); ≤1280px there's no right gap. */}
-        <div className="min-w-0 flex-1 min-[1281px]:pr-[232px]">
-          <div className="max-w-full space-y-6 min-[1281px]:max-w-[83.33%] min-[1920px]:max-w-[66.66%]">
-            <h1 className="text-2xl font-bold">{heading}</h1>
+            child); ≤1280px there's no right gap.
+
+            -mt-6 pulls the column up into the shell's 24px top padding so the
+            cap below can fill that strip — otherwise scrolling content shows
+            through it, above the toolbar. */}
+        <div className="-mt-6 min-w-0 flex-1 min-[1281px]:pr-[232px]">
+          <div className="max-w-full min-[1281px]:max-w-[83.33%] min-[1920px]:max-w-[66.66%]">
+            {/* Invisible top edge — an opaque cap pinned to the very top of the
+                content area, level with the secondary-nav top edge. Fills the
+                shell's top padding strip so the heading and content box scroll
+                up and vanish behind it instead of peeking above the toolbar. */}
+            <div
+              aria-hidden
+              className="pointer-events-none sticky -top-6 z-20 h-6 bg-background"
+            />
+
+            <h1 className="text-base font-bold">{heading}</h1>
 
             {/* Action toolbar — left-aligned, above the content box. Sticky:
-                pins to the top while the page scrolls (the heading scrolls
-                away). It pins below `main`'s 24px top padding, so a `before`
-                strip fills that 24px band — covering content that would
-                otherwise show above the buttons and reading as 24px padding
-                above them. Content scrolls cleanly beneath. */}
+                pins to the top edge while the page scrolls (the heading scrolls
+                away behind the cap). The band's background + 24px bottom padding
+                stay opaque, so the content box scrolls cleanly under it instead
+                of showing through. mt-4 keeps the 16px gap from the heading. */}
             {formActions && (
-              <div className="sticky top-0 z-10 flex items-center gap-3 bg-background before:absolute before:inset-x-0 before:bottom-full before:h-6 before:bg-background before:content-[''] after:absolute after:inset-x-0 after:top-full after:h-3 after:bg-background after:content-['']">
-                {formActions}
+              <div className="sticky top-0 z-10 mt-4 bg-background pb-6">
+                <div className="flex items-center gap-3">{formActions}</div>
               </div>
             )}
 
@@ -301,7 +313,7 @@ export function EditForm({
             <div className="space-y-6 rounded-xl border-2 border-black p-8">
               {recordTitle && (
                 <div className="flex items-center gap-2">
-                  <span className="text-lg font-bold">{recordTitle}</span>
+                  <span className="text-base font-bold">{recordTitle}</span>
                   <button type="button" aria-label="Rename">
                     <Pencil className="h-4 w-4" strokeWidth={2.25} />
                   </button>

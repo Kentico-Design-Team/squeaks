@@ -68,8 +68,8 @@ export function Overview({
         <SecondaryNav nav={secondaryNav} />
 
         {/* Right content column */}
-        <div className="flex flex-1 flex-col gap-6">
-          <h1 className="text-2xl font-bold">{title}</h1>
+        <div className="flex flex-1 flex-col gap-4">
+          <h1 className="text-base font-bold">{title}</h1>
 
           {/* Quick tip callout */}
           <Callout
@@ -79,8 +79,8 @@ export function Overview({
             body={callout.body}
           />
 
-          {/* Primary action */}
-          <div>
+          {/* Primary action — 24px below it before the content region (gap-4 + mb-2). */}
+          <div className="mb-2">
             <Button className="h-10 rounded-full px-6 text-xs font-bold tracking-wide">
               {primaryActionLabel}
             </Button>

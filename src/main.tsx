@@ -15,6 +15,7 @@ import ActivityTypes from "./pages/activity-types";
 import ActivityTypeGeneral from "./pages/activity-type-general";
 import EditFormPage from "./pages/edit-form";
 import SecondaryNavShowcase from "./pages/secondary-nav-showcase";
+import BarItemPage from "./pages/bar-item";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -43,6 +44,7 @@ createRoot(document.getElementById("root")!).render(
             path="secondary-nav-showcase"
             element={<SecondaryNavShowcase />}
           />
+          <Route path="bar-item" element={<BarItemPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

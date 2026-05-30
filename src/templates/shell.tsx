@@ -260,19 +260,19 @@ export function Shell({
       >
       {/* Top bar */}
       <header className="flex items-center justify-between gap-4 px-4">
-        <div className="flex items-center gap-4">
+        <div className="flex min-w-0 items-center gap-4">
           {(workspace || language) && (
-            <div className="flex h-10 items-center overflow-hidden rounded-xl border-2 border-black">
+            <div className="flex h-10 min-w-0 items-center overflow-hidden rounded-xl border-2 border-black">
               {workspace && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
                       aria-label="Channel"
-                      className="flex h-full items-center gap-2 px-6 font-bold outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                      className="flex h-full min-w-0 items-center gap-2 px-6 font-bold outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
                     >
-                      {workspace}
-                      <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
+                      <span className="truncate">{workspace}</span>
+                      <ChevronDown className="h-4 w-4 shrink-0" strokeWidth={2.5} />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -305,13 +305,13 @@ export function Shell({
                     <button
                       type="button"
                       aria-label="Language"
-                      className={`flex h-full items-center gap-2 px-6 font-bold outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset ${
+                      className={`flex h-full min-w-0 items-center gap-2 px-6 font-bold outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset ${
                         workspace ? "border-l-2 border-black" : ""
                       }`}
                     >
-                      <Globe className="h-4 w-4" strokeWidth={2.25} />
-                      {language}
-                      <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
+                      <Globe className="h-4 w-4 shrink-0" strokeWidth={2.25} />
+                      <span className="truncate">{language}</span>
+                      <ChevronDown className="h-4 w-4 shrink-0" strokeWidth={2.5} />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -341,35 +341,35 @@ export function Shell({
             </div>
           )}
 
-          <div className="flex h-10 items-center gap-3 rounded-xl border-2 border-black px-4">
-            <Link to="/" aria-label="Home">
+          <div className="flex h-10 min-w-0 items-center gap-3 rounded-xl border-2 border-black px-4">
+            <Link to="/" aria-label="Home" className="shrink-0">
               <House className="h-4 w-4" strokeWidth={2.25} />
             </Link>
             {crumbs.map((bc, i) => (
-              <div key={i} className="flex items-center gap-3">
+              <div key={i} className="flex min-w-0 items-center gap-3">
                 <ChevronRight
-                  className="h-4 w-4 text-muted-foreground"
+                  className="h-4 w-4 shrink-0 text-muted-foreground"
                   strokeWidth={2.5}
                 />
                 {bc.href ? (
-                  <Link to={bc.href} className="hover:underline">
+                  <Link to={bc.href} className="truncate hover:underline">
                     {bc.label}
                   </Link>
                 ) : (
-                  <span>{bc.label}</span>
+                  <span className="truncate">{bc.label}</span>
                 )}
               </div>
             ))}
             {status && (
-              <div className="ml-2 flex items-center gap-2">
+              <div className="ml-2 flex shrink-0 items-center gap-2">
                 <Copy className="h-4 w-4" strokeWidth={2.25} />
-                <span>{status}</span>
+                <span className="whitespace-nowrap">{status}</span>
               </div>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-3">{actions}</div>
+        <div className="flex shrink-0 items-center gap-3">{actions}</div>
       </header>
 
       {/* Main content. tightRight drops the right padding so the view menu

@@ -60,6 +60,11 @@ const PAGES: Entry[] = [
     name: "Secondary nav — 4 levels deep",
     desc: "Drill-down secondary nav nested four levels, bordered boxes",
   },
+  {
+    path: "/bar-item",
+    name: "Bar items & shelves",
+    desc: "Collapsible rows with form bodies, drag handles, shelves",
+  },
 ];
 
 function CardGrid({ items }: { items: Entry[] }) {

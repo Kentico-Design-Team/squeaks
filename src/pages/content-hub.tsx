@@ -53,6 +53,25 @@ export default function ContentHubPage() {
         { label: "Content type: Article, Code, Image, Event, Blog post…" },
         { label: "Status: Published" },
       ]}
+      filterFields={[
+        { type: "text", label: "Name" },
+        {
+          type: "checkbox",
+          label: "Content type",
+          options: ["Article", "Code snippet", "Image", "Event", "Blog post"],
+        },
+        {
+          type: "select",
+          label: "Workspace",
+          options: ["Dancing Goat", "Shared"],
+        },
+        {
+          type: "select",
+          label: "Status",
+          options: ["Published", "Draft", "Scheduled", "Unpublished"],
+        },
+        { type: "daterange", label: "Last modified" },
+      ]}
       shortcuts={[
         {
           label: "All content items",
@@ -94,7 +113,7 @@ export default function ContentHubPage() {
         { label: "Workspace" },
         { label: "Last modified" },
         { label: "Status" },
-        { label: "Actions", cellAlign: "right" },
+        { label: "Actions", align: "right", cellAlign: "right", width: "w-24" },
       ]}
       rows={ITEMS.map(([name, type, workspace, modified], i) => ({
         id: i + 1,

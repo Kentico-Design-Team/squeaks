@@ -1,15 +1,6 @@
 import { Listing } from "@/templates/listing";
-import { Activity, ListChecks, Trash2, Users } from "lucide-react";
-
-const DeleteButton = () => (
-  <button
-    type="button"
-    aria-label="Delete"
-    className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-foreground"
-  >
-    <Trash2 className="h-4 w-4" strokeWidth={2.25} />
-  </button>
-);
+import { RowActions } from "@/components/custom/row-actions";
+import { Activity, ListChecks, Users } from "lucide-react";
 
 export default function Contacts() {
   return (
@@ -47,7 +38,7 @@ export default function Contacts() {
         { label: "Email bounces" },
         { label: "Country" },
         { label: "Created" },
-        { label: "Actions", cellAlign: "right" },
+        { label: "Actions", align: "right", cellAlign: "right", width: "w-24" },
       ]}
       rows={[
         {
@@ -59,7 +50,7 @@ export default function Contacts() {
             "",
             "",
             "05/29/2026 8:28 AM",
-            <DeleteButton />,
+            <RowActions actions={["delete"]} />,
           ],
         },
         {
@@ -71,7 +62,7 @@ export default function Contacts() {
             "",
             "",
             "05/29/2026 9:16 AM",
-            <DeleteButton />,
+            <RowActions actions={["delete"]} />,
           ],
         },
       ]}

@@ -5,6 +5,11 @@ import {
   type SecondaryNavData,
 } from "@/components/custom/secondary-nav";
 import { Callout } from "@/components/custom/callout";
+import {
+  SidePanel,
+  filterFieldsFromColumns,
+  type FilterField,
+} from "@/components/custom/side-panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -17,13 +22,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-} from "@/components/ui/pagination";
-import {
   Table,
   TableBody,
   TableCell,
@@ -34,7 +32,7 @@ import {
 import {
   ArrowUp,
   Check,
-  ListFilter,
+  ChevronRight,
   Search,
   TriangleAlert,
   X,
@@ -45,6 +43,8 @@ export type ListingColumn = {
   sorted?: "asc" | "desc";
   align?: "left" | "center" | "right";
   cellAlign?: "left" | "center" | "right";
+  /** Fixed column width (Tailwind class, e.g. "w-24"). Applied to head + cells. */
+  width?: string;
 };
 
 export type ListingRow = {
@@ -89,6 +89,11 @@ export type ListingProps = Omit<ShellProps, "children"> & {
   primaryAction?: ListingPrimaryAction;
   /** Show the outline FILTER pill on the right of the toolbar. */
   showFilter?: boolean;
+  /**
+   * Fields for the filter side-panel opened by the FILTER pill. Pass a set that
+   * mirrors the table columns; when omitted, a text filter is derived per column.
+   */
+  filterFields?: FilterField[];
   /** Applied-filter chips. Strings render as removable chips. */
   appliedFilters?: ReactNode[];
   /** Render a leading checkbox column for row selection. */
@@ -151,6 +156,7 @@ export function Listing({
   callout,
   primaryAction,
   showFilter = false,
+  filterFields,
   appliedFilters,
   selectable = false,
   pagination,
@@ -173,10 +179,11 @@ export function Listing({
       <div className="flex gap-6">
         {secondaryNav && <SecondaryNav nav={secondaryNav} />}
 
-        <div className="flex-1 space-y-5">
+        <div className="flex-1 space-y-4">
           {content ?? (
             <>
-          <h1 className="text-2xl font-bold">{heading ?? title}</h1>
+          {/* 16px below the heading (space-y-4) — matches the other templates. */}
+          <h1 className="text-base font-bold">{heading ?? title}</h1>
 
           {calloutNode}
 
@@ -203,13 +210,9 @@ export function Listing({
             </div>
 
             {showFilter && (
-              <Button
-                variant="outline"
-                className="h-10 shrink-0 gap-2 rounded-full px-6 text-xs font-bold tracking-wide has-[>svg]:px-6"
-              >
-                <ListFilter className="h-4 w-4" strokeWidth={2.25} />
-                FILTER
-              </Button>
+              <SidePanel
+                fields={filterFields ?? filterFieldsFromColumns(columns)}
+              />
             )}
           </div>
 
@@ -253,7 +256,7 @@ export function Listing({
                 {columns.map((col) => (
                   <TableHead
                     key={col.label}
-                    className={TEXT_ALIGN[col.align ?? "left"]}
+                    className={`${TEXT_ALIGN[col.align ?? "left"]} ${col.width ?? ""}`}
                   >
                     <span
                       className={`flex items-center gap-1 ${FLEX_ALIGN[col.align ?? "left"]}`}
@@ -284,11 +287,11 @@ export function Listing({
                   {row.cells.map((cell, i) => (
                     <TableCell
                       key={i}
-                      className={
+                      className={`${
                         TEXT_ALIGN[
                           columns[i]?.cellAlign ?? columns[i]?.align ?? "left"
                         ]
-                      }
+                      } ${columns[i]?.width ?? ""}`}
                     >
                       {cell}
                     </TableCell>
@@ -298,40 +301,47 @@ export function Listing({
             </TableBody>
           </Table>
 
-          {/* Footer / pagination */}
+          {/* Pagination — mirrors the content hub footer (no item count,
+              custom page buttons + Next chevron, font-bold per-page select). */}
           {pagination && (
             <div className="flex items-center justify-between gap-4 pt-2">
-              <span className="shrink-0">
-                {pagination.totalItems ?? rows.length} items
-              </span>
+              <div className="flex items-center gap-1">
+                {(pagination.pages ?? [1]).map((page, i) =>
+                  page === "…" ? (
+                    <span key={`gap-${i}`} className="px-1">
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={`${page}-${i}`}
+                      type="button"
+                      className={`grid h-9 min-w-9 place-items-center rounded-xl px-2 ${
+                        page === pagination.current
+                          ? "bg-black text-white"
+                          : "border-2 border-transparent hover:border-black"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ),
+                )}
+                <button
+                  type="button"
+                  aria-label="Next page"
+                  className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-black"
+                >
+                  <ChevronRight className="h-4 w-4" strokeWidth={2.25} />
+                </button>
+              </div>
 
-              <Pagination className="mx-0 w-auto justify-center">
-                <PaginationContent>
-                  {(pagination.pages ?? [1]).map((page, i) => (
-                    <PaginationItem key={`${page}-${i}`}>
-                      {page === "…" ? (
-                        <PaginationEllipsis />
-                      ) : (
-                        <PaginationLink
-                          href="#"
-                          isActive={page === pagination.current}
-                        >
-                          {page}
-                        </PaginationLink>
-                      )}
-                    </PaginationItem>
-                  ))}
-                </PaginationContent>
-              </Pagination>
-
-              <div className="flex shrink-0 items-center gap-2">
-                <span>Items per page</span>
-                <Select defaultValue={String(pagination.perPage ?? 200)}>
-                  <SelectTrigger className="h-10 rounded-full border-2 border-black px-4">
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Items per page</span>
+                <Select defaultValue={String(pagination.perPage ?? 20)}>
+                  <SelectTrigger className="h-10 rounded-full border-2 border-black px-4 font-bold">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {(pagination.perPageOptions ?? [25, 50, 100, 200]).map(
+                    {(pagination.perPageOptions ?? [20, 50, 100, 200]).map(
                       (opt) => (
                         <SelectItem key={opt} value={String(opt)}>
                           {opt}

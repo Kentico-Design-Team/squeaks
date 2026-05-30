@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { SIDE_PANEL_POSITION_SIDE_MENU } from "@/components/custom/side-panel";
 import {
   Check,
   ChevronDown,
@@ -196,7 +197,8 @@ function MenuItemBody({
       >
         <Icon className="h-5 w-5" strokeWidth={2.25} />
       </span>
-      <span className={`text-xs ${active ? "font-bold" : ""}`}>{label}</span>
+      {/* Match the shell left nav bar label size (text-sm / 14px). */}
+      <span className={`text-sm ${active ? "font-bold" : ""}`}>{label}</span>
     </>
   );
 }
@@ -356,7 +358,7 @@ export function Editor({
         <div className="min-h-0 flex-1 overflow-auto rounded-xl border-2 border-black bg-background">
           {activePage && !activeTab?.ownHeading && (
             <div className="flex items-center gap-2 px-8 pt-8">
-              <h1 className="text-xl font-bold">{activePage.label}</h1>
+              <h1 className="text-base font-bold">{activePage.label}</h1>
               <button type="button" aria-label="Rename">
                 <Pencil className="h-4 w-4" strokeWidth={2.25} />
               </button>
@@ -368,12 +370,10 @@ export function Editor({
         </div>
 
         {/* Side panel — overlays the page when a side-menu item is open.
-            Fixed 648px wide, 8px from the top/bottom of the viewport, with its
-            right edge 8px left of the 88px menu column. The right offset tracks
-            the AIRA rail (closed) vs. panel (open): 64px/var(--aira-panel)+24px
-            of shell padding, plus the 88px menu and 8px gap. */}
+            648px wide; SIDE_PANEL_POSITION_SIDE_MENU docks it 8px left of the
+            88px view-menu column (see side-panel.tsx for the shared geometry). */}
         {activeSideItem && (
-          <div className="fixed inset-y-2 right-[160px] z-20 flex w-[648px] flex-col rounded-xl border-2 border-black bg-background group-data-[aira-open=true]/shell:right-[calc(var(--aira-panel)+120px)]">
+          <div className={`${SIDE_PANEL_POSITION_SIDE_MENU} flex w-[648px] flex-col rounded-xl border-2 border-black bg-background`}>
             <header className="flex items-center justify-between px-6 py-4">
               <h2 className="text-xl font-bold">{activeSideItem.label}</h2>
               <button

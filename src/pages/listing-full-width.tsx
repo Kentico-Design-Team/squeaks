@@ -1,31 +1,5 @@
 import { Listing, StatusBadge, TagBadge } from "@/templates/listing";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-
-const RowActions = () => (
-  <div className="flex items-center justify-end gap-1">
-    <button
-      type="button"
-      aria-label="Edit"
-      className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-foreground"
-    >
-      <Pencil className="h-4 w-4" strokeWidth={2.25} />
-    </button>
-    <button
-      type="button"
-      aria-label="Delete"
-      className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-foreground"
-    >
-      <Trash2 className="h-4 w-4" strokeWidth={2.25} />
-    </button>
-    <button
-      type="button"
-      aria-label="More"
-      className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-foreground"
-    >
-      <MoreHorizontal className="h-4 w-4" strokeWidth={2.25} />
-    </button>
-  </div>
-);
+import { RowActions } from "@/components/custom/row-actions";
 
 const EMAILS = [
   "mvonderlin@kentico.com",
@@ -65,6 +39,18 @@ export default function ListingFullWidth() {
       }}
       primaryAction={{ label: "PRIMARY ACTION" }}
       showFilter
+      filterFields={[
+        {
+          type: "checkbox",
+          label: "Content type",
+          options: ["Article", "Cafe", "Image", "Event", "Blog post"],
+        },
+        {
+          type: "select",
+          label: "Status",
+          options: ["Published", "Draft", "Scheduled", "Unpublished"],
+        },
+      ]}
       appliedFilters={[
         "Content type: Article, Cafe, Image, Event, Blog post…",
         "Status: Published",
@@ -78,7 +64,7 @@ export default function ListingFullWidth() {
         { label: "Default column" },
         { label: "Status" },
         { label: "Default column" },
-        { label: "Actions", cellAlign: "right" },
+        { label: "Actions", align: "right", cellAlign: "right", width: "w-24" },
       ]}
       rows={EMAILS.map((email, i) => ({
         id: i + 1,

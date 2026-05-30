@@ -106,7 +106,7 @@ function ContentTab({ page }: EditorContentContext) {
     <div className="flex flex-col gap-6 px-[17%] pt-16 pb-8">
       {/* Page heading */}
       <div className="flex items-center gap-2">
-        <h1 className="text-xl font-bold">{title}</h1>
+        <h1 className="text-base font-bold">{title}</h1>
         <button type="button" aria-label="Rename">
           <Pencil className="h-4 w-4" strokeWidth={2.25} />
         </button>
@@ -115,7 +115,7 @@ function ContentTab({ page }: EditorContentContext) {
       {/* Title */}
       <label className="block space-y-1">
         <FieldLabel required>Title</FieldLabel>
-        <Input defaultValue={title} className="h-12 rounded-full px-5" />
+        <Input defaultValue={title} className="h-10 rounded-full px-5" />
       </label>
 
       {/* Publish date */}
@@ -123,7 +123,7 @@ function ContentTab({ page }: EditorContentContext) {
         <FieldLabel required>Publish date</FieldLabel>
         <div className="flex items-center gap-4">
           <div className="relative flex-1">
-            <Input defaultValue="9/9/2023" className="h-12 rounded-full pl-5 pr-12" />
+            <Input defaultValue="9/9/2023" className="h-10 rounded-full pl-5 pr-12" />
             <Calendar
               className="absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2"
               strokeWidth={2.25}
@@ -265,7 +265,7 @@ function ContentTab({ page }: EditorContentContext) {
 
 function CommentsPanel() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <p className="text-muted-foreground">
         Leave notes for your teammates about this page. Comments are only visible
         in the editor and never published.
@@ -286,7 +286,7 @@ function CommentsPanel() {
 
 function RemindersPanel() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <p className="text-muted-foreground">
         Schedule a reminder to revisit this page — for a content refresh, a
         seasonal update, or a fact check.
@@ -294,7 +294,7 @@ function RemindersPanel() {
       <label className="block space-y-1">
         <FieldLabel>Remind me on</FieldLabel>
         <div className="relative">
-          <Input defaultValue="6/30/2026" className="h-12 rounded-full pl-5 pr-12" />
+          <Input defaultValue="6/30/2026" className="h-10 rounded-full pl-5 pr-12" />
           <Calendar
             className="absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2"
             strokeWidth={2.25}

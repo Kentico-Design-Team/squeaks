@@ -1,32 +1,7 @@
 import { Link } from "react-router";
 import { Listing } from "@/templates/listing";
-import { Activity, ListChecks, MoreHorizontal, Pencil, Trash2, Users } from "lucide-react";
-
-const RowActions = () => (
-  <div className="flex items-center justify-end gap-1">
-    <button
-      type="button"
-      aria-label="Edit"
-      className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-foreground"
-    >
-      <Pencil className="h-4 w-4" strokeWidth={2.25} />
-    </button>
-    <button
-      type="button"
-      aria-label="Delete"
-      className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-foreground"
-    >
-      <Trash2 className="h-4 w-4" strokeWidth={2.25} />
-    </button>
-    <button
-      type="button"
-      aria-label="More"
-      className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-foreground"
-    >
-      <MoreHorizontal className="h-4 w-4" strokeWidth={2.25} />
-    </button>
-  </div>
-);
+import { RowActions } from "@/components/custom/row-actions";
+import { Activity, ListChecks, Users } from "lucide-react";
 
 const TYPES = [
   "Click",
@@ -70,7 +45,7 @@ export default function ActivityTypes() {
       }}
       columns={[
         { label: "Activity type name" },
-        { label: "Actions", cellAlign: "right" },
+        { label: "Actions", align: "right", cellAlign: "right", width: "w-24" },
       ]}
       rows={TYPES.map((name, i) => ({
         id: i + 1,

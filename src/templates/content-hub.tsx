@@ -37,20 +37,25 @@ import {
   Folder,
   LayoutGrid,
   List,
-  MoreHorizontal,
   Plus,
   Search,
   Settings,
-  Trash2,
   TriangleAlert,
   X,
 } from "lucide-react";
 import { Callout } from "@/components/custom/callout";
+import {
+  SidePanel,
+  filterFieldsFromColumns,
+  type FilterField,
+} from "@/components/custom/side-panel";
+import { RowActions } from "@/components/custom/row-actions";
 import { useResizableTree } from "@/hooks/use-resizable-tree";
 import { StatusBadge, TagBadge } from "@/templates/listing";
 
-// Chips/filters are unified across the app — reuse the listing's components.
-export { StatusBadge, TagBadge };
+// Shared row/status components are unified across the app — re-export so pages
+// can keep importing them from the template they already use.
+export { StatusBadge, TagBadge, RowActions };
 
 /* ---------------------------------- Tree --------------------------------- */
 
@@ -76,6 +81,8 @@ export type ContentHubColumn = {
   sorted?: "asc" | "desc";
   align?: "left" | "center" | "right";
   cellAlign?: "left" | "center" | "right";
+  /** Fixed column width (Tailwind class, e.g. "w-24"). Applied to head + cells. */
+  width?: string;
 };
 
 export type ContentHubRow = {
@@ -94,6 +101,11 @@ export type ContentHubProps = Omit<ShellProps, "children"> & {
   primaryAction?: string;
   searchPlaceholder?: string;
   appliedFilters?: AppliedFilter[];
+  /**
+   * Fields for the filter side-panel opened by the FILTER pill. Pass a set that
+   * mirrors the table columns; when omitted, a text filter is derived per column.
+   */
+  filterFields?: FilterField[];
   itemCount?: number;
   columns?: ContentHubColumn[];
   rows?: ContentHubRow[];
@@ -168,31 +180,19 @@ const DEFAULT_COLUMNS: ContentHubColumn[] = [
   { label: "Default column" },
   { label: "Default column" },
   { label: "Default column" },
-  { label: "Actions", cellAlign: "right" },
+  { label: "Actions", align: "right", cellAlign: "right", width: "w-24" },
 ];
-
-export const RowActions = () => (
-  <span className="flex items-center justify-end gap-1">
-    <button
-      type="button"
-      aria-label="More"
-      className="grid h-8 w-8 place-items-center rounded-xl border-2 border-transparent hover:border-foreground"
-    >
-      <MoreHorizontal className="h-4 w-4" strokeWidth={2.25} />
-    </button>
-    <button
-      type="button"
-      aria-label="Delete"
-      className="grid h-8 w-8 place-items-center rounded-xl border-2 border-transparent hover:border-foreground"
-    >
-      <Trash2 className="h-4 w-4" strokeWidth={2.25} />
-    </button>
-  </span>
-);
 
 const makeRow = (id: number, c1: string, c2: string, c3: string): ContentHubRow => ({
   id,
-  cells: ["marekm@kentico.com", c1, c2, c3, <StatusBadge />, <RowActions />],
+  cells: [
+    "marekm@kentico.com",
+    c1,
+    c2,
+    c3,
+    <StatusBadge />,
+    <RowActions actions={["more", "delete"]} />,
+  ],
 });
 
 const DEFAULT_ROWS: ContentHubRow[] = [
@@ -274,6 +274,7 @@ export function ContentHub({
     { label: "Content type: Article, Code, Image, Event, Blog post…" },
     { label: "Status: Published" },
   ],
+  filterFields,
   itemCount = 232,
   columns = DEFAULT_COLUMNS,
   rows = DEFAULT_ROWS,
@@ -299,9 +300,9 @@ export function ContentHub({
   // bottom padding (+16px) so the tree/listing sit 8px from the screen edge.
   return (
     <Shell {...shellProps} fitHeight>
-      <div className="flex h-[calc(100%+16px)] flex-col gap-5">
-        {/* Full-width header block above the tree + listing columns */}
-        <h1 className="text-2xl font-bold">{title}</h1>
+      <div className="flex h-[calc(100%+16px)] flex-col gap-4">
+        {/* Full-width header block above the tree + listing columns. */}
+        <h1 className="text-base font-bold">{title}</h1>
 
         {/* Callout banner */}
         {callout && (
@@ -348,13 +349,10 @@ export function ContentHub({
               strokeWidth={2}
             />
           </div>
-          <Button
-            variant="outline"
-            className="h-10 shrink-0 gap-2 rounded-full px-6 text-xs font-bold tracking-wide has-[>svg]:px-6"
-          >
-            <Filter className="h-4 w-4" strokeWidth={2.25} />
-            FILTER
-          </Button>
+          <SidePanel
+            icon={Filter}
+            fields={filterFields ?? filterFieldsFromColumns(columns)}
+          />
         </div>
 
         {/* Applied filters */}
@@ -470,15 +468,20 @@ export function ContentHub({
             </div>
 
           {/* Data table — the only scroll area on the right; the header row
-              stays pinned while the body scrolls under it. */}
-          <Table containerClassName="min-h-0 flex-1 overflow-y-auto">
+              stays pinned while the body scrolls under it. Sizes to its
+              content (no flex-1) so the pagination sits right after the last
+              row, only shrinking + scrolling when the rows overflow. */}
+          <Table containerClassName="min-h-0 overflow-y-auto">
             <TableHeader className="sticky top-0 z-10 bg-background">
               <TableRow>
                 <TableHead className="w-10">
                   <Checkbox aria-label="Select all" />
                 </TableHead>
                 {columns.map((col) => (
-                  <TableHead key={col.label} className={TEXT_ALIGN[col.align ?? "left"]}>
+                  <TableHead
+                    key={col.label}
+                    className={`${TEXT_ALIGN[col.align ?? "left"]} ${col.width ?? ""}`}
+                  >
                     <span
                       className={`flex items-center gap-1 ${FLEX_ALIGN[col.align ?? "left"]}`}
                     >
@@ -503,11 +506,11 @@ export function ContentHub({
                   {row.cells.map((cell, i) => (
                     <TableCell
                       key={i}
-                      className={
+                      className={`${
                         TEXT_ALIGN[
                           columns[i]?.cellAlign ?? columns[i]?.align ?? "left"
                         ]
-                      }
+                      } ${columns[i]?.width ?? ""}`}
                     >
                       {cell}
                     </TableCell>

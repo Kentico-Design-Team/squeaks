@@ -64,7 +64,7 @@ export default function SecondaryNavShowcase() {
       secondaryNav={nav}
       content={
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold">Item 1</h1>
+          <h1 className="text-base font-bold">Item 1</h1>
           <p className="text-muted-foreground">
             Four levels deep. Each opened item nests its own bordered section
             directly beneath it; the highlighted item is the deepest current

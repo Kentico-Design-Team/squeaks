@@ -1,33 +1,7 @@
 import { Link, useParams } from "react-router";
 import { Listing, StatusBadge, TagBadge } from "@/templates/listing";
+import { RowActions } from "@/components/custom/row-actions";
 import type { SecondaryNavData } from "@/components/custom/secondary-nav";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-
-const RowActions = () => (
-  <div className="flex items-center justify-end gap-1">
-    <button
-      type="button"
-      aria-label="Edit"
-      className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-foreground"
-    >
-      <Pencil className="h-4 w-4" strokeWidth={2.25} />
-    </button>
-    <button
-      type="button"
-      aria-label="Delete"
-      className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-foreground"
-    >
-      <Trash2 className="h-4 w-4" strokeWidth={2.25} />
-    </button>
-    <button
-      type="button"
-      aria-label="More"
-      className="grid h-9 w-9 place-items-center rounded-xl border-2 border-transparent hover:border-foreground"
-    >
-      <MoreHorizontal className="h-4 w-4" strokeWidth={2.25} />
-    </button>
-  </div>
-);
 
 const EMAILS = [
   "mvonderlin@kentico.com",
@@ -88,8 +62,8 @@ export default function ListingSecondary() {
   // The body swaps with the navigation: the table is the "Item 1" page; opening
   // a row (or switching sub-tabs) shows that object's own page content instead.
   const body = opened ? (
-    <div className="space-y-5">
-      <h1 className="text-2xl font-bold">{activeTab.label}</h1>
+    <div className="space-y-4">
+      <h1 className="text-base font-bold">{activeTab.label}</h1>
       <div className="grid min-h-96 place-items-center rounded-xl border-2 border-black text-muted-foreground">
         {activeTab.label} content
       </div>
@@ -124,6 +98,19 @@ export default function ListingSecondary() {
       }}
       primaryAction={{ label: "PRIMARY ACTION" }}
       showFilter
+      filterFields={[
+        { type: "text", label: "Email" },
+        {
+          type: "checkbox",
+          label: "Content type",
+          options: ["Article", "Cafe", "Image", "Event", "Blog post"],
+        },
+        {
+          type: "select",
+          label: "Status",
+          options: ["Published", "Draft", "Scheduled", "Unpublished"],
+        },
+      ]}
       appliedFilters={[
         "Content type: Article, Cafe, Image, Event, Blog post…",
         "Status: Published",
@@ -136,7 +123,7 @@ export default function ListingSecondary() {
         { label: "Default column" },
         { label: "Status" },
         { label: "Default column" },
-        { label: "Actions", cellAlign: "right" },
+        { label: "Actions", align: "right", cellAlign: "right", width: "w-24" },
       ]}
       rows={EMAILS.map((email, i) => ({
         id: i + 1,
