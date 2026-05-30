@@ -2,6 +2,15 @@ import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { Link } from "react-router";
 import { Aira, AIRA_PANEL_DEFAULT_WIDTH } from "@/components/custom/aira";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   ChevronDown,
@@ -210,7 +219,7 @@ export function Shell({
                   }`}
                 >
                   <span
-                    className={`grid h-11 w-11 place-items-center rounded-xl ${
+                    className={`grid h-10 w-10 place-items-center rounded-xl ${
                       active ? "bg-black text-white" : ""
                     }`}
                   >
@@ -253,27 +262,81 @@ export function Shell({
       <header className="flex items-center justify-between gap-4 px-4">
         <div className="flex items-center gap-4">
           {(workspace || language) && (
-            <div className="flex h-10 items-center rounded-xl border-2 border-black">
+            <div className="flex h-10 items-center overflow-hidden rounded-xl border-2 border-black">
               {workspace && (
-                <button
-                  type="button"
-                  className="flex h-full items-center gap-2 px-6 font-bold"
-                >
-                  {workspace}
-                  <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Channel"
+                      className="flex h-full items-center gap-2 px-6 font-bold outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                    >
+                      {workspace}
+                      <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    onCloseAutoFocus={(e) => e.preventDefault()}
+                  >
+                    <DropdownMenuLabel className="font-bold">
+                      Workspaces
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuRadioGroup value={workspace}>
+                      {["Dancing Goat", "Dancing Goat Commerce", "Kentico.com"].map(
+                        (option) => (
+                          <DropdownMenuRadioItem
+                            key={option}
+                            value={option}
+                            className={option === workspace ? "font-bold" : ""}
+                          >
+                            {option}
+                          </DropdownMenuRadioItem>
+                        ),
+                      )}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
               {language && (
-                <button
-                  type="button"
-                  className={`flex h-full items-center gap-2 px-6 font-bold ${
-                    workspace ? "border-l-2 border-black" : ""
-                  }`}
-                >
-                  <Globe className="h-4 w-4" strokeWidth={2.25} />
-                  {language}
-                  <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Language"
+                      className={`flex h-full items-center gap-2 px-6 font-bold outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset ${
+                        workspace ? "border-l-2 border-black" : ""
+                      }`}
+                    >
+                      <Globe className="h-4 w-4" strokeWidth={2.25} />
+                      {language}
+                      <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    onCloseAutoFocus={(e) => e.preventDefault()}
+                  >
+                    <DropdownMenuLabel className="font-bold">
+                      Language variants
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuRadioGroup value={language}>
+                      {["English", "Čeština", "Deutsch", "Español"].map(
+                        (option) => (
+                          <DropdownMenuRadioItem
+                            key={option}
+                            value={option}
+                            className={option === language ? "font-bold" : ""}
+                          >
+                            {option}
+                          </DropdownMenuRadioItem>
+                        ),
+                      )}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           )}
@@ -396,8 +459,8 @@ export function Shell({
                         onClick={() => setOpenNav(null)}
                         className="group flex flex-col items-center gap-2 p-2 text-center leading-tight"
                       >
-                        <span className="grid h-12 w-12 place-items-center rounded-xl group-hover:bg-black group-hover:text-white">
-                          <Icon className="h-7 w-7" strokeWidth={2} />
+                        <span className="grid h-10 w-10 place-items-center rounded-xl group-hover:bg-black group-hover:text-white">
+                          <Icon className="h-6 w-6" strokeWidth={2} />
                         </span>
                         <span>{item.label}</span>
                       </Link>

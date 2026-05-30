@@ -90,9 +90,20 @@ function Section({
   );
 }
 
-export function SecondaryNav({ nav }: { nav: SecondaryNavData }): ReactNode {
+export function SecondaryNav({
+  nav,
+  sticky,
+}: {
+  nav: SecondaryNavData;
+  /** Pin to the top of the scroll container while the page scrolls. */
+  sticky?: boolean;
+}): ReactNode {
   return (
-    <aside className="w-56 shrink-0 self-start rounded-xl border-2 border-black bg-background py-4 pl-4 pr-2">
+    <aside
+      className={`w-56 shrink-0 self-start rounded-xl border-2 border-black bg-background py-4 pl-4 pr-2 ${
+        sticky ? "sticky top-0 max-h-[calc(100vh-96px)] overflow-auto" : ""
+      }`}
+    >
       <Section section={nav} />
     </aside>
   );

@@ -17,4 +17,10 @@
   with an icon silently renders at 12px. Add `has-[>svg]:px-6` alongside `px-6`
   on icon + text buttons (e.g. FILTER) to keep the 24px padding.
 
-Implemented in: `src/templates/shell.tsx`, `listing.tsx`, `content-hub.tsx`, `editor.tsx`.
+- **Edit form — sticky action toolbar.** In the `edit-form` template the
+  action toolbar (PUBLISH/SAVE) is **sticky to the top** while the page scrolls;
+  the page `<h1>` heading/title above it is **not** sticky and scrolls away. The
+  toolbar carries a `bg-background` (plus a `before:` strip covering the scroll
+  container's top padding) so form content scrolls cleanly beneath it.
+
+Implemented in: `src/templates/shell.tsx`, `listing.tsx`, `content-hub.tsx`, `editor.tsx`, `edit-form.tsx`.

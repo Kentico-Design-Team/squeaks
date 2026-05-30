@@ -5,6 +5,12 @@ import {
   type SecondaryNavData,
 } from "@/components/custom/secondary-nav";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   AlignCenter,
@@ -115,12 +121,23 @@ const DEFAULT_FORM_ACTIONS = (
       <Button className="h-10 rounded-l-full rounded-r-none px-6 text-xs font-bold tracking-wide">
         PUBLISH
       </Button>
-      <Button
-        aria-label="Publish options"
-        className="h-10 rounded-l-none rounded-r-full border-l-2 border-l-white px-2"
-      >
-        <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            aria-label="Publish options"
+            className="h-10 rounded-l-none rounded-r-full border-l-2 border-l-white px-2"
+          >
+            <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
+          <DropdownMenuItem>Schedule publish…</DropdownMenuItem>
+          <DropdownMenuItem>Save as draft</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
     <Button
       variant="outline"
@@ -258,7 +275,7 @@ export function EditForm({
   return (
     <Shell {...shellProps}>
       <div className="flex gap-6">
-        {secondaryNav && <SecondaryNav nav={secondaryNav} />}
+        {secondaryNav && <SecondaryNav nav={secondaryNav} sticky />}
 
         {/* Form column max-width steps with the viewport: 100% ≤1280px,
             83.33% on 1281–1919px, 66.66% ≥1920px. Above 1280px a 232px right
@@ -268,9 +285,16 @@ export function EditForm({
           <div className="max-w-full space-y-6 min-[1281px]:max-w-[83.33%] min-[1920px]:max-w-[66.66%]">
             <h1 className="text-2xl font-bold">{heading}</h1>
 
-            {/* Action toolbar — left-aligned, above the content box. */}
+            {/* Action toolbar — left-aligned, above the content box. Sticky:
+                pins to the top while the page scrolls (the heading scrolls
+                away). It pins below `main`'s 24px top padding, so a `before`
+                strip fills that 24px band — covering content that would
+                otherwise show above the buttons and reading as 24px padding
+                above them. Content scrolls cleanly beneath. */}
             {formActions && (
-              <div className="flex items-center gap-3">{formActions}</div>
+              <div className="sticky top-0 z-10 flex items-center gap-3 bg-background before:absolute before:inset-x-0 before:bottom-full before:h-6 before:bg-background before:content-[''] after:absolute after:inset-x-0 after:top-full after:h-3 after:bg-background after:content-['']">
+                {formActions}
+              </div>
             )}
 
             {/* Content area — bordered box with 32px inner padding. */}

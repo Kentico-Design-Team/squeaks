@@ -1,5 +1,11 @@
 import { Editor, type EditorContentContext } from "@/templates/editor";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -49,12 +55,24 @@ const Actions = (
       <Button className="h-10 rounded-l-full rounded-r-none px-6 text-xs font-bold tracking-wide">
         CHANGE WORKFLOW STEP
       </Button>
-      <Button
-        aria-label="Workflow options"
-        className="h-10 rounded-l-none rounded-r-full border-l-2 border-l-white px-2"
-      >
-        <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            aria-label="Workflow options"
+            className="h-10 rounded-l-none rounded-r-full border-l-2 border-l-white px-2"
+          >
+            <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
+          <DropdownMenuItem>Approve</DropdownMenuItem>
+          <DropdownMenuItem>Reject</DropdownMenuItem>
+          <DropdownMenuItem>Reassign…</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   </>
 );

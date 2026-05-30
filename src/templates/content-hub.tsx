@@ -4,7 +4,20 @@ import { Shell, type ShellProps } from "@/templates/shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -33,6 +46,7 @@ import {
   X,
 } from "lucide-react";
 import { Callout } from "@/components/custom/callout";
+import { useResizableTree } from "@/hooks/use-resizable-tree";
 import { StatusBadge, TagBadge } from "@/templates/listing";
 
 // Chips/filters are unified across the app — reuse the listing's components.
@@ -90,6 +104,11 @@ export type ContentHubProps = Omit<ShellProps, "children"> & {
   /** Recursive folder tree under the "Folders" section. */
   folders?: TreeNode[];
 };
+
+// Tree navigator resize bounds. Default keeps the original 288px (w-72) width.
+const TREE_DEFAULT_WIDTH = 288;
+const TREE_MIN_WIDTH = 220;
+const TREE_MAX_WIDTH = 480;
 
 const TEXT_ALIGN: Record<NonNullable<ContentHubColumn["align"]>, string> = {
   left: "text-left",
@@ -263,6 +282,12 @@ export function ContentHub({
   folders = DEFAULT_FOLDERS,
   ...shellProps
 }: ContentHubProps) {
+  const { width: treeWidth, startResize } = useResizableTree({
+    defaultWidth: TREE_DEFAULT_WIDTH,
+    minWidth: TREE_MIN_WIDTH,
+    maxWidth: TREE_MAX_WIDTH,
+  });
+
   const shortcutClass = (active?: boolean) =>
     `flex items-center gap-2 rounded-xl px-2 py-1.5 ${
       active
@@ -270,9 +295,11 @@ export function ContentHub({
         : "border-2 border-transparent hover:border-black"
     }`;
 
+  // fitHeight locks the page; the content column reaches into main's 24px
+  // bottom padding (+16px) so the tree/listing sit 8px from the screen edge.
   return (
-    <Shell {...shellProps}>
-      <div className="space-y-5">
+    <Shell {...shellProps} fitHeight>
+      <div className="flex h-[calc(100%+16px)] flex-col gap-5">
         {/* Full-width header block above the tree + listing columns */}
         <h1 className="text-2xl font-bold">{title}</h1>
 
@@ -293,12 +320,23 @@ export function ContentHub({
             <Button className="h-10 rounded-l-full rounded-r-none px-6 text-xs font-bold tracking-wide">
               {primaryAction}
             </Button>
-            <Button
-              aria-label="More options"
-              className="h-10 rounded-l-none rounded-r-full border-l-2 border-l-white px-2"
-            >
-              <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  aria-label="More options"
+                  className="h-10 rounded-l-none rounded-r-full border-l-2 border-l-white px-2"
+                >
+                  <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                onCloseAutoFocus={(e) => e.preventDefault()}
+              >
+                <DropdownMenuItem>New folder</DropdownMenuItem>
+                <DropdownMenuItem>Import…</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <div className="relative flex-1">
             <Input
@@ -341,10 +379,17 @@ export function ContentHub({
           ))}
         </div>
 
-        {/* Tree navigator (left) + listing (right) */}
-        <div className="flex gap-6">
-          {/* LEFT — content tree navigator */}
-          <aside className="w-72 shrink-0 self-start rounded-xl border-2 border-black bg-background p-3">
+        {/* Tree navigator (left) + listing (right) — fills the remaining
+            height; the page itself never scrolls (Shell fitHeight). */}
+        <div className="flex min-h-0 flex-1 gap-6">
+          {/* LEFT — content tree navigator. Manually resizable (drag the right
+              edge); the inner aside owns its own vertical scroll when the tree
+              is taller than the viewport. */}
+          <div
+            className="relative shrink-0"
+            style={{ width: `${treeWidth}px` }}
+          >
+          <aside className="h-full w-full overflow-y-auto rounded-xl border-2 border-black bg-background p-3">
             {/* Standalone shortcuts */}
             <ul className="flex flex-col gap-1">
               {shortcuts.map((s) => (
@@ -383,10 +428,21 @@ export function ContentHub({
             </ul>
           </aside>
 
-          {/* RIGHT — listing area */}
-          <div className="min-w-0 flex-1 space-y-5">
+            {/* Drag the right edge to resize. Mirrors the AIRA panel handle. */}
+            <div
+              onMouseDown={startResize}
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Resize content tree"
+              className="absolute top-0 bottom-0 right-0 z-10 w-2 translate-x-1/2 cursor-ew-resize"
+            />
+          </div>
+
+          {/* RIGHT — listing area. Column layout so only the table body
+              scrolls: the count row and pagination stay pinned. */}
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-5">
             {/* Item count + view toggles */}
-            <div className="flex items-center justify-between">
+            <div className="flex shrink-0 items-center justify-between">
               <span className="font-bold">{itemCount} items</span>
               <div className="flex items-center gap-1">
                 <button
@@ -413,9 +469,10 @@ export function ContentHub({
               </div>
             </div>
 
-          {/* Data table */}
-          <Table>
-            <TableHeader>
+          {/* Data table — the only scroll area on the right; the header row
+              stays pinned while the body scrolls under it. */}
+          <Table containerClassName="min-h-0 flex-1 overflow-y-auto">
+            <TableHeader className="sticky top-0 z-10 bg-background">
               <TableRow>
                 <TableHead className="w-10">
                   <Checkbox aria-label="Select all" />
@@ -460,8 +517,8 @@ export function ContentHub({
             </TableBody>
           </Table>
 
-          {/* Pagination */}
-          <div className="flex items-center justify-between">
+          {/* Pagination — pinned below the scrolling table. */}
+          <div className="flex shrink-0 items-center justify-between">
             <div className="flex items-center gap-1">
               {[1, "…", 556, 557, 558, "…", 3453].map((p, i) =>
                 p === "…" ? (
@@ -492,10 +549,18 @@ export function ContentHub({
             </div>
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground">Items per page</span>
-              <button className="flex h-10 items-center gap-2 rounded-full border-2 border-black px-4 font-bold">
-                20
-                <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
-              </button>
+              <Select defaultValue="20">
+                <SelectTrigger className="h-10 rounded-full border-2 border-black px-4 font-bold">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[20, 50, 100, 200].map((opt) => (
+                    <SelectItem key={opt} value={String(opt)}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           </div>

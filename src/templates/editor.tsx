@@ -1,7 +1,14 @@
 import { type ComponentType, type ReactNode, useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { Shell, type ShellBreadcrumb, type ShellProps } from "@/templates/shell";
+import { useResizableTree } from "@/hooks/use-resizable-tree";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Check,
@@ -82,6 +89,11 @@ export type EditorProps = Omit<ShellProps, "children" | "breadcrumbs"> & {
 };
 
 const DEFAULT_TABS: EditorTab[] = [];
+
+// Tree panel resize bounds. Default keeps the original 304px width.
+const TREE_DEFAULT_WIDTH = 304;
+const TREE_MIN_WIDTH = 240;
+const TREE_MAX_WIDTH = 520;
 
 /** Flatten the tree to its selectable leaf pages, in document order. */
 function collectPages(items: EditorTreeItem[]): EditorTreeItem[] {
@@ -212,6 +224,12 @@ export function Editor({
 }: EditorProps) {
   const params = useParams();
 
+  const { width: treeWidth, startResize } = useResizableTree({
+    defaultWidth: TREE_DEFAULT_WIDTH,
+    minWidth: TREE_MIN_WIDTH,
+    maxWidth: TREE_MAX_WIDTH,
+  });
+
   const hasTree = !!treeItems && treeItems.length > 0;
   const pages = collectPages(treeItems ?? []);
   const activePage = pages.find((p) => p.slug === params.pageId) ?? pages[0];
@@ -265,7 +283,10 @@ export function Editor({
       <div className="relative flex h-full min-h-0">
         {/* Left tree panel — optional; hidden when no treeItems are passed */}
         {hasTree && (
-        <aside className="mr-1 flex w-[304px] shrink-0 flex-col gap-4 rounded-xl border-2 border-black bg-background p-3">
+        <aside
+          style={{ width: `${treeWidth}px` }}
+          className="relative mr-1 flex shrink-0 flex-col gap-4 rounded-xl border-2 border-black bg-background p-3"
+        >
           {/* Split "new" button */}
           <div className="flex">
             <Button
@@ -275,13 +296,24 @@ export function Editor({
               <Plus className="h-4 w-4" strokeWidth={2.5} />
               {newLabel}
             </Button>
-            <Button
-              variant="outline"
-              aria-label="More options"
-              className="-ml-0.5 h-10 rounded-l-none rounded-r-full px-2"
-            >
-              <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  aria-label="More options"
+                  className="-ml-0.5 h-10 rounded-l-none rounded-r-full px-2"
+                >
+                  <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                onCloseAutoFocus={(e) => e.preventDefault()}
+              >
+                <DropdownMenuItem>New folder</DropdownMenuItem>
+                <DropdownMenuItem>Import…</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Search */}
@@ -308,6 +340,15 @@ export function Editor({
               />
             ))}
           </ul>
+
+          {/* Drag the right edge to resize. Mirrors the AIRA panel handle. */}
+          <div
+            onMouseDown={startResize}
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Resize content tree"
+            className="absolute top-0 bottom-0 right-0 z-10 w-2 translate-x-1/2 cursor-ew-resize"
+          />
         </aside>
         )}
 
